@@ -1,8 +1,8 @@
-const Content = ({ parts, exercises }) => {
+const Content = ({ parts }) => {
   return (
     <>
       {parts.map((part, index) => (
-        <Part key={index} name={part} exerciseCount={exercises[index]} />
+        <Part key={index} name={part.name} exerciseCount={part.exercises} />
       ))}
     </>
   );
