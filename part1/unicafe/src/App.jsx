@@ -1,34 +1,54 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const Button = ({text, handleClick}) => {
+  return <button onClick={handleClick}>{text}</button>
+}
+
+const StatisticLine = ({label, value}) => {
+  return <p>{label} {value}</p>
+} 
+
+const Statistics = ({good, neutral, bad}) => {
+
+  const total = good + neutral + bad;
+  const average = total && (good - bad) / total;
+  const positive = total && good / total * 100;
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>statistics</h1>
+      { good || neutral || bad ? 
+        <>
+          <StatisticLine label="good" value={good}/>
+          <StatisticLine label="neutral" value={neutral}/>
+          <StatisticLine label="bad" value={bad}/>
+          <StatisticLine label="all" value={total}/>
+          <StatisticLine label="average" value={average}/>
+          <StatisticLine label="positive" value={`${positive} %`}/>
+
+        </> : 
+        <p>No feedback given</p> 
+    }
     </>
+  )
+}
+
+const App = () => {
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+
+  const incValue = (setter) => () => setter(current => current + 1);
+
+  return (
+    <div>
+      <h1>give feedback</h1>
+      <Button text="good" handleClick={incValue(setGood)}/>
+      <Button text="neutral" handleClick={incValue(setNeutral)}/>
+      <Button text="bad" handleClick={incValue(setBad)}/>
+      <Statistics good={good} neutral={neutral} bad={bad}/>
+    </div>
   )
 }
 
