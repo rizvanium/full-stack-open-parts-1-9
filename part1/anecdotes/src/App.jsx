@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import Button from './Button';
+import Anecdote from './Anecdote';
 
 const App = () => {
-  const initialAnecdotes = [
+  const anecdotesDB = [
     {
       text: 'If it hurts, do it more often.',
       votes: 0,
@@ -37,28 +38,35 @@ const App = () => {
     }
   ];
 
-  const [anecdotes, setAnecdotes] = useState(initialAnecdotes);
+  const [anecdotes, setAnecdotes] = useState(anecdotesDB);
   const getRandomIndex = () => getRandom(0, anecdotes.length - 1 || 0);
 
   const [selectedIdx, setSelectedIdx] = useState(getRandomIndex());
-  const selectedAnecdote = anecdotes[selectedIdx];
 
   const selectNextAnecdote = () => setSelectedIdx(getRandomIndex());
-  const incVoteCount = () => setAnecdotes(anecdotes.map((anecdote, idx) => idx === selectedIdx ? {...anecdote, votes: anecdote.votes + 1} : anecdote));
-
+  const incVoteCount = () => setAnecdotes(anecdotes.map((anecdote, idx) => idx === selectedIdx ? {...anecdote, votes: anecdote.votes + 1} : {...anecdote}));
+ 
+  const totalVotes = anecdotes.map(anecdote => anecdote.votes).reduce((total, current) => total + current, 0);
+  const selectedAnecdote = anecdotes[selectedIdx];
+  const mostPopularAnecdote = anecdotes.reduce((best, current) => current.votes > best.votes ? current : best);
+  
   return (
     <div>
-      <p>{selectedAnecdote.text}</p>
-      <p>has {selectedAnecdote.votes} votes</p>
-      <Button handleClick={incVoteCount}>
-        vote
-      </Button>
-      <Button handleClick={selectNextAnecdote}>
-        next anecdote
-      </Button>
+      <Anecdote 
+        title="Anecdote of the day" 
+        text={selectedAnecdote.text} 
+        votes={selectedAnecdote.votes} />
+      <Button text="vote" handleClick={incVoteCount} />
+      <Button text="next anecdote" handleClick={selectNextAnecdote} />
+      { totalVotes ? <Anecdote 
+          title="Anecdote with most votes" 
+          text={mostPopularAnecdote.text} 
+          votes={mostPopularAnecdote.votes}/> : <p>No votes gathered yet</p>}
+
     </div>
   )
 }
+
 
 function getRandom(min, max) {
   min = Math.ceil(min);
