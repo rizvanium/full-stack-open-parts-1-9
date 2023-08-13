@@ -1,8 +1,8 @@
 const Content = ({ parts }) => {
   return (
     <>
-      {parts.map((part, index) => (
-        <Part key={index} name={part.name} exerciseCount={part.exercises} />
+      {parts.map((part) => (
+        <Part key={part.id} name={part.name} exerciseCount={part.exercises} />
       ))}
     </>
   );
