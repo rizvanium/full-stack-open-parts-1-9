@@ -6,11 +6,8 @@ import PersonsList from './PersonsList';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  console.log('before');
   useEffect(() => {
-    console.log('inside');
     axios.get('http://localhost:3001/persons').then(response => {
-      console.log('fullfiled');
       setPersons(response.data);
     });
   }, []);
@@ -47,8 +44,6 @@ const App = () => {
     setNewName('');
     setNewNumber('');
   }
-
-  console.log('after');
 
   return (
     <div>
