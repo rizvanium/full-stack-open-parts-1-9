@@ -49,7 +49,7 @@ const App = () => {
   const totalVotes = anecdotes.map(anecdote => anecdote.votes).reduce((total, current) => total + current, 0);
   const selectedAnecdote = anecdotes[selectedIdx];
   const mostPopularAnecdote = anecdotes.reduce((best, current) => current.votes > best.votes ? current : best);
-  
+
   return (
     <div>
       <Anecdote 
@@ -61,12 +61,11 @@ const App = () => {
       { totalVotes ? <Anecdote 
           title="Anecdote with most votes" 
           text={mostPopularAnecdote.text} 
-          votes={mostPopularAnecdote.votes}/> : <p>No votes gathered yet</p>}
+          votes={mostPopularAnecdote.votes}/> : <p>No votes gathered yet</p> }
 
     </div>
   )
 }
-
 
 function getRandom(min, max) {
   min = Math.ceil(min);
