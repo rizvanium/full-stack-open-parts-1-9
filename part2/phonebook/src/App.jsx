@@ -52,10 +52,12 @@ const App = () => {
         setNewName('');
         setNewNumber('');
       })
-      .catch(err => console.log(err));      
+      .catch(err => console.log(err));
   }
 
-  const deletePerson = (id) => {
+  const deletePerson = (id, name) => {
+    if (!confirm(`Delete ${name}?`)) return;
+    
     personService.remove(id).then(() => {
       setPersons(persons.filter(p => p.id !== id));
     }).catch();
