@@ -1,17 +1,31 @@
 import { useEffect, useState } from 'react'
+import countryService from './services/countries';
 
 function App() {
-  const [country, setCountry] = useState(null);
+  const [searchWord, setSearchWord] = useState(null);
+  const [countries, setCountries] = useState(null);
 
   const handleInputChange = (event) => {
-    setCountry(event.target.value);
+    setSearchWord(event.target.value);
   }
-    console.log("pre effect");
 
   useEffect(() => {
+
+    if (!searchWord) return;
+
+    countryService
+      .getAll()
+      .then(data => {
+        const matchedCountries = data.filter(country => 
+          country.name.common
+            .toLowerCase()
+            .includes(searchWord.toLowerCase()));
+        console.log(matchedCountries);
+        setCountries([...matchedCountries]);
+      })
+      .catch(err => console.log(err));
     
-  }, [country]);
-  console.log("post effect");
+  }, [searchWord]);
 
   return (
     <div>
