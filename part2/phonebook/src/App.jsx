@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import personService from './services/persons';
 import InputField from './components/InputField';
+import Notification from './components/Notification';
 import NewPersonForm from './NewPersonForm';
 import PersonsList from './PersonsList';
 
@@ -9,6 +10,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [searchPhrase, setSearchPhrase] = useState('');
   const [persons, setPersons] = useState([]);
+  const [message, setMessage] = useState({ text: '', isError: false });
   
   useEffect(() => {
     personService.getAll().then(initialPersons => {
@@ -35,8 +37,19 @@ const App = () => {
         setPersons(persons.map(p => p.id === person.id ? { ...responseData } : p));
         setNewName('');
         setNewNumber('');
+        setMessage({
+          text: `Successfully replaced ${person.name} phone number`,
+          isError: false
+        });
+        setTimeout(() => setMessage({ text: '', isError: false }), 5000);
       })
-      .catch();
+      .catch(() => {
+        setMessage({
+          text: `Server failed replacing the number`,
+          isError: true
+        });
+        setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+      });
   }
 
   const addNewPerson = (event) => {
@@ -46,7 +59,11 @@ const App = () => {
     const normalizedNumber = newNumber.trim().toLowerCase(); 
 
     if (normalizedName === '' || normalizedNumber === '') {
-      alert('all fields must be filled');
+      setMessage({
+        text: `All fields must be filled`,
+        isError: true
+      });
+      setTimeout(() => setMessage({ text: '', isError: false }), 5000);
       return;
     }
     
@@ -70,8 +87,19 @@ const App = () => {
         setPersons([...persons, person]);
         setNewName('');
         setNewNumber('');
+        setMessage({
+          text: `Successfully added ${person.name} to a contact list`,
+          isError: false
+        });
+        setTimeout(() => setMessage({ text: '', isError: false }), 5000);
       })
-      .catch(err => console.log(err));
+      .catch(() => {
+        setMessage({
+          text: `Server failed to add ${newPerson.name} to contact list`,
+          isError: true
+        });
+        setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+      });
   }
 
   const deletePerson = (id, name) => {
@@ -79,12 +107,24 @@ const App = () => {
     
     personService.remove(id).then(() => {
       setPersons(persons.filter(p => p.id !== id));
-    }).catch();
+      setMessage({
+        text: `Successfully removed ${name} from a contact list`,
+        isError: false
+      });
+      setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+    }).catch(() => {
+      setMessage({
+        text: `Information of ${name} has already been removed from the server`,
+        isError: false
+      });
+      setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+    });
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message.text} isError={message.isError}/>
       <InputField label="filter shown with" value={searchPhrase} handleInput={handleSearchChange} />
       <h3>Add a new</h3>
       <NewPersonForm 
