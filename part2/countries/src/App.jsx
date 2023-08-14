@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react'
 import countryService from './services/countries';
 
 function App() {
-  const [searchWord, setSearchWord] = useState(null);
+  const [searchWord, setSearchWord] = useState('');
   const [countries, setCountries] = useState(null);
 
   const handleInputChange = (event) => {
     setSearchWord(event.target.value);
   }
 
-  useEffect(() => {
+  const changeSearchWord = (word) => {
+    setSearchWord(word);
+  }
 
+  useEffect(() => {
     if (!searchWord || searchWord == '') {
       setCountries([]);
       return;
@@ -34,25 +37,26 @@ function App() {
       })
       .catch(err => console.log(err));
     
-  }, [searchWord]);
-
+  }, [searchWord]); 
   return (
     <div>
-      <p>find countries <input type='text' onChange={handleInputChange} /></p>
+      <p>find countries <input type='text' value={searchWord} onChange={handleInputChange} /></p>
       { countries && 
-        (countries.length === 1 ? <CountryDetails country={countries[0]} /> : <CountryList countries={countries}/>) 
+        (countries.length === 1  ? 
+          <CountryDetails country={countries[0]} /> : 
+          <CountryList countries={countries} handleSelection={changeSearchWord}/>) 
       }
     </div>
   )
 }
 
-const CountryList = ({ countries }) => {
+const CountryList = ({ countries, handleSelection }) => {
   if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
 
   return <div>
-    {countries.map(country => <p key={country.area}>{country.name}</p>)}
+    {countries.map((country) => <p key={country.area}>{country.name}  <button onClick={() => handleSelection(country.name)}>show</button></p>)}
   </div>
 }
 
@@ -60,6 +64,7 @@ const CountryDetails = ({ country }) => {
   if (!country) {
     return null;
   }
+
   return (<div>
     <h2>{country.name}</h2>
     <p>capital: {country.capitals.join(', ')}</p>
