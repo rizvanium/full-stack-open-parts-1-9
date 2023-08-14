@@ -55,6 +55,12 @@ const App = () => {
       .catch(err => console.log(err));      
   }
 
+  const deletePerson = (id) => {
+    personService.remove(id).then(() => {
+      setPersons(persons.filter(p => p.id !== id));
+    }).catch();
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -67,7 +73,7 @@ const App = () => {
         handleNameChange={handleNameChange} 
         handleNumberChange={handleNumberChange} />
       <h3>Numbers</h3>
-      <PersonsList list={displayedPersonList}/>
+      <PersonsList list={displayedPersonList} handleDeletion={deletePerson}/>
     </div>
   )
 }

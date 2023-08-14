@@ -17,8 +17,7 @@ const create = person => {
 
 const remove = (id) => {
   return axios
-    .delete(`${PERSONS_URL}/${id}`)
-    .then(response => response.data);
+    .delete(`${PERSONS_URL}/${id}`);
 }
 
 export default {
