@@ -15,6 +15,12 @@ const create = person => {
     .then(response => response.data);
 }
 
+const update = (updatedPerson, id) => {
+  return axios
+    .put(`${PERSONS_URL}/${id}`, updatedPerson)
+    .then(response => response.data);
+}
+
 const remove = (id) => {
   return axios
     .delete(`${PERSONS_URL}/${id}`);
@@ -23,5 +29,6 @@ const remove = (id) => {
 export default {
   getAll,
   create,
+  update,
   remove
 };

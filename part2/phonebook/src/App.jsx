@@ -24,6 +24,21 @@ const App = () => {
     p.name.toLowerCase().startsWith(searchPhrase.toLowerCase())
   );
 
+  const replaceNumber = (person) => {
+    const updatedPerson = {
+      ...person,
+      number: newNumber
+    };
+
+    personService.update(updatedPerson, person.id)
+      .then(responseData => {
+        setPersons(persons.map(p => p.id === person.id ? { ...responseData } : p));
+        setNewName('');
+        setNewNumber('');
+      })
+      .catch();
+  }
+
   const addNewPerson = (event) => {
     event.preventDefault();
     
@@ -34,10 +49,14 @@ const App = () => {
       alert('all fields must be filled');
       return;
     }
+    
+    const duplicatePerson = persons.find(person => person.name.toLowerCase() === normalizedName);
+    if (duplicatePerson) {
+      const shouldReplaceNumber = confirm(`${newName.trim()} is already added to phonebook, replace the old number with a new one?`);
 
-    if (persons.find(person => person.name.toLowerCase() === normalizedName)) {
-      alert(`${normalizedName} is already added to phonebook`);
-      return;
+      if (!shouldReplaceNumber) return;
+
+      return replaceNumber(duplicatePerson);
     }
     
     const newPerson = { 
