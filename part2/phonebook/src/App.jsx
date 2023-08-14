@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import personService from './services/persons';
 import InputField from './components/InputField';
 import NewPersonForm from './NewPersonForm';
 import PersonsList from './PersonsList';
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data);
-    });
-  }, []);
-
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchPhrase, setSearchPhrase] = useState('');
+  const [persons, setPersons] = useState([]);
+  
+  useEffect(() => {
+    personService.getAll().then(initialPersons => {
+      setPersons(initialPersons);
+    });
+  }, []);
 
   const handleNameChange = (event) => setNewName(event.target.value);
   const handleNumberChange = (event) => setNewNumber(event.target.value);
@@ -39,10 +39,20 @@ const App = () => {
       alert(`${normalizedName} is already added to phonebook`);
       return;
     }
-
-    setPersons([...persons, { name: newName.trim(), number: newNumber.trim() }]);
-    setNewName('');
-    setNewNumber('');
+    
+    const newPerson = { 
+      name: newName.trim(), 
+      number: newNumber.trim() 
+    };
+    
+    personService
+      .create(newPerson)
+      .then(person => {
+        setPersons([...persons, person]);
+        setNewName('');
+        setNewNumber('');
+      })
+      .catch(err => console.log(err));      
   }
 
   return (
