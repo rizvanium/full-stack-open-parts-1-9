@@ -57,9 +57,6 @@ function App() {
 }
 
 const CountryList = ({ countries, handleSelection }) => {
-  console.log(countries, 'in CountryList');
-  console.log(countries.filter(c => !c.capitalGeo.lat), 'in CountryList');
-
   if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
@@ -70,6 +67,20 @@ const CountryList = ({ countries, handleSelection }) => {
 }
 
 const CountryDetails = ({ country }) => {
+  return (<div>
+    <h2>{country.name}</h2>
+    <p>capital: {country.capitals ? country.capitals.join(', ') : 'no info'}</p>
+    <p>area: {country.area}</p>
+    <h3>languages:</h3>
+    <ul>
+      { Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>) }
+    </ul>
+    <img src={country.flags.png} alt={country.flags.alt}/>
+    <WeatherDetails country={country} />
+  </div>)
+}
+
+const WeatherDetails = ({ country }) => {
   const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
@@ -90,24 +101,16 @@ const CountryDetails = ({ country }) => {
       });
   }, [country]);
 
-  return (<div>
-    <h2>{country.name}</h2>
-    <p>capital: {country.capitals ? country.capitals.join(', ') : 'no info'}</p>
-    <p>area: {country.area}</p>
-    <h3>languages:</h3>
-    <ul>
-      { Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>) }
-    </ul>
-    <img src={country.flags.png} alt={country.flags.alt}/>
-    <h3>Weather in {country.capitals ? country.capitals[0] : country.name}</h3>
-    { weatherData ? (<div>
-      <p>temperature {weatherData.temp} Celcius</p>
-      <img src={weatherData.weatherIconUrl} alt={weatherData.weatherIconAlt} />
-      <p>wind {weatherData.windSpeed} m/s</p>
-    </div>) : <h3>No weather data could be found</h3>
-    }
-
-  </div>)
+  return (
+    <div>
+      <h3>Weather in {country.capitals ? country.capitals[0] : country.name}</h3>
+      { weatherData ? (<div>
+        <p>temperature {weatherData.temp} Celcius</p>
+        <img src={weatherData.weatherIconUrl} alt={weatherData.weatherIconAlt} />
+        <p>wind {weatherData.windSpeed} m/s</p>
+      </div>) : <h3>No weather data could be found</h3>
+      }
+    </div>)
 }
 
 export default App
