@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import countryService from './services/countries';
-import weatherService from './services/weather';
+import CountryDetails from './components/CountryDetails';
+import CountryList from './components/CountryList';
 
 function App() {
   const [searchWord, setSearchWord] = useState('');
@@ -54,63 +55,6 @@ function App() {
       }
     </div>
   )
-}
-
-const CountryList = ({ countries, handleSelection }) => {
-  if (countries.length > 10) {
-    return <p>Too many matches, specify another filter</p>
-  }
-
-  return <div>
-    {countries.map((country) => <p key={country.area}>{country.name}  <button onClick={() => handleSelection(country.name)}>show</button></p>)}
-  </div>
-}
-
-const CountryDetails = ({ country }) => {
-  return (<div>
-    <h2>{country.name}</h2>
-    <p>capital: {country.capitals ? country.capitals.join(', ') : 'no info'}</p>
-    <p>area: {country.area}</p>
-    <h3>languages:</h3>
-    <ul>
-      { Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>) }
-    </ul>
-    <img src={country.flags.png} alt={country.flags.alt}/>
-    <WeatherDetails country={country} />
-  </div>)
-}
-
-const WeatherDetails = ({ country }) => {
-  const [weatherData, setWeatherData] = useState(null);
-
-  useEffect(() => {
-    if (!country) return;
-    
-    weatherService.getWeatherInfo(country)
-      .then(data => {
-        const weatherIcon = data.weather[0].icon;
-        setWeatherData({
-          temp: data.main.temp ,
-          windSpeed: data.wind.speed,
-          weatherIconUrl: `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`,
-          weatherIconAlt: data.weather[0].description
-        });
-      })
-      .catch(() => {
-        setWeatherData(null);
-      });
-  }, [country]);
-
-  return (
-    <div>
-      <h3>Weather in {country.capitals ? country.capitals[0] : country.name}</h3>
-      { weatherData ? (<div>
-        <p>temperature {weatherData.temp} Celcius</p>
-        <img src={weatherData.weatherIconUrl} alt={weatherData.weatherIconAlt} />
-        <p>wind {weatherData.windSpeed} m/s</p>
-      </div>) : <h3>No weather data could be found</h3>
-      }
-    </div>)
 }
 
 export default App
