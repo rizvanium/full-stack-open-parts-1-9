@@ -43,9 +43,9 @@ const App = () => {
         });
         setTimeout(() => setMessage({ text: '', isError: false }), 5000);
       })
-      .catch(() => {
+      .catch(error => {
         setMessage({
-          text: `Server failed replacing the number`,
+          text: error.response.data.error,
           isError: true
         });
         setTimeout(() => setMessage({ text: '', isError: false }), 5000);
@@ -93,9 +93,9 @@ const App = () => {
         });
         setTimeout(() => setMessage({ text: '', isError: false }), 5000);
       })
-      .catch(() => {
+      .catch(error => {
         setMessage({
-          text: `Server failed to add ${newPerson.name} to contact list`,
+          text: error.response.data.error,
           isError: true
         });
         setTimeout(() => setMessage({ text: '', isError: false }), 5000);
