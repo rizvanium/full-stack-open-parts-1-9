@@ -220,3 +220,71 @@ describe('mostBlogs returns', () => {
     });
   });
 });
+
+describe('mostLikes returns', () => {
+  const singleBlogList = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Test Blog 1',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+  ];
+
+  const listWithSameAuthors = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 9,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 2',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 3,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 3',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 4,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 4',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 3,
+      __v: 0,
+    },
+  ];
+
+  test('[null] when blog list is empty, null or undefined', () => {
+    expect(listHelper.mostLikes([])).toBe(null);
+  });
+
+  test('the only author in the list when list contains one blog', () => {
+    const mostLikes = listHelper.mostLikes(singleBlogList);
+    expect(mostLikes).toStrictEqual({
+      author: 'Test Dummy 1',
+      likes: 5,
+    });
+  });
+
+  test('most liked author in the list when list contains multiple blogs', () => {
+    const mostLikes = listHelper.mostLikes(listWithSameAuthors);
+    expect(mostLikes).toStrictEqual({
+      author: 'Test Dummy 2',
+      likes: 10,
+    });
+  });
+});
