@@ -2,11 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const logger = require('./utils/logger');
+const config = require('./utils/config');
 const Blog = require('./models/blog');
 const app = express();
 
-const mongoUrl = 'mongodb://localhost/bloglist';
-mongoose.connect(mongoUrl)
+mongoose.connect(config.MONGODB_URI)
   .then(() => {
     logger.info('connected to MongoDB!');
   })
@@ -35,7 +35,6 @@ app.post('/api/blogs', (request, response) => {
     });
 });
 
-const PORT = 3003;
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
+app.listen(config.PORT, () => {
+  logger.info(`Server running on port ${config.PORT}`);
 });
