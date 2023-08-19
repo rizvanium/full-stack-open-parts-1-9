@@ -11,3 +11,6 @@ Content-Type: application/json
   "url": "test-url",
   "likes": 0
 }
+
+###
+GET http://localhost:3003/api/non-existant
