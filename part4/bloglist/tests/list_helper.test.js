@@ -101,7 +101,6 @@ describe('favorite blog', () => {
 
   test('when list contains one blog is equal to that blog', () => {
     const favorite = listHelper.favoriteBlog(listWithSingleBlog);
-    console.log(favorite);
     expect(favorite).toStrictEqual({
       title: 'Go To Statement Considered Harmful',
       author: 'Test Dummy 1',
@@ -111,11 +110,113 @@ describe('favorite blog', () => {
 
   test('when list contains multiple blogs is equal to most liked blog', () => {
     const favorite = listHelper.favoriteBlog(listWithMultipleBlogs);
-    console.log(favorite);
     expect(favorite).toStrictEqual({
       title: 'Last Most Liked Blog',
       author: 'Test Dummy 4',
       likes: 900,
+    });
+  });
+});
+
+describe('mostBlogs returns', () => {
+  const singleBlogList = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Test Blog 1',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+  ];
+
+  const listWithUniqueAuthors = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Test Blog 1',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 2',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 3,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 3',
+      author: 'Test Dummy 3',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 900,
+      __v: 0,
+    },
+  ];
+
+  const listWithSameAuthors = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 2',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 3,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 3',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 900,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 4',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 900,
+      __v: 0,
+    },
+  ];
+
+  test('null when list is empty', () => {
+    expect(listHelper.mostBlogs([])).toBe(null);
+  });
+
+  test('correct blog author with a blog count of one when list contains one blog', () => {
+    let mostBlogs = listHelper.mostBlogs(singleBlogList);
+    expect(mostBlogs).toStrictEqual({
+      author: 'Test Dummy 1',
+      blogs: 1,
+    });
+  });
+
+  test('first author in the list when list contains multiple blogs with unique authors', () => {
+    let mostBlogs = listHelper.mostBlogs(listWithUniqueAuthors);
+    expect(mostBlogs).toStrictEqual({
+      author: 'Test Dummy 1',
+      blogs: 1,
+    });
+  });
+
+  test('author with the most blogs when list contains multiple blogs with the same author', () => {
+    let mostBlogs = listHelper.mostBlogs(listWithSameAuthors);
+    expect(mostBlogs).toStrictEqual({
+      author: 'Test Dummy 2',
+      blogs: 3,
     });
   });
 });
