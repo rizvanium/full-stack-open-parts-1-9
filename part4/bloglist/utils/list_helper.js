@@ -35,32 +35,11 @@ const favoriteBlog = (blogs) => {
 };
 
 const mostBlogs = (blogs) => {
-  if (blogs.length === 0) {
+  if (blogs.length === 0 || blogs.length === 0) {
     return null;
   }
 
-  const { max } = blogs.reduce(
-    (groupWithMax, blog) => {
-      let { group, max } = groupWithMax;
-      const author = blog.author;
-
-      group[author] = group[author] ?? {
-        author,
-        blogs: 0,
-      };
-
-      group[author] = { ...group[author], blogs: group[author].blogs + 1 };
-
-      if (group[author].blogs > max.blogs) {
-        max = { ...group[author] };
-      }
-
-      return { group, max };
-    },
-    { group: {}, max: { author: '', blogs: 0 } }
-  );
-
-  return max;
+  return groupMax(blogs, 'author', 'blogs');
 };
 
 const mostLikes = (blogs) => {
