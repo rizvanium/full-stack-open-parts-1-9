@@ -5,12 +5,12 @@ test('dummy returns one', () => {
 });
 
 describe('total likes', () => {
-  const listWithOneBlog = [
+  const listWithSingleBlog = [
     {
       _id: '5a422aa71b54a676234d17f8',
       title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
       likes: 5,
       __v: 0,
     },
@@ -40,10 +40,74 @@ describe('total likes', () => {
   });
 
   test('when list has only one blog post equals the likes of that', () => {
-    expect(listHelper.totalLikes(listWithOneBlog)).toBe(5);
+    expect(listHelper.totalLikes(listWithSingleBlog)).toBe(5);
   });
 
   test('of a bigger list is calculated right', () => {
     expect(listHelper.totalLikes(listWithMultipleBlogs)).toBe(8);
+  });
+});
+
+describe('favorite blog', () => {
+  const listWithSingleBlog = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+  ];
+
+  const listWithMultipleBlogs = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Test Dummy 1',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 5,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Test Blog 2',
+      author: 'Test Dummy 2',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 3,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Most Liked Blog',
+      author: 'Test Dummy 3',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 900,
+      __v: 0,
+    },
+  ];
+
+  test('of empty list is null', () => {
+    expect(listHelper.favoriteBlog([])).toBe(null);
+  });
+
+  test('when list contains one blog is equal to that blog', () => {
+    const favorite = listHelper.favoriteBlog(listWithSingleBlog);
+    console.log(favorite);
+    expect(favorite).toStrictEqual({
+      title: 'Go To Statement Considered Harmful',
+      author: 'Test Dummy 1',
+      likes: 5,
+    });
+  });
+
+  test('when list contains multiple blogs is equal to most liked blog', () => {
+    const favorite = listHelper.favoriteBlog(listWithMultipleBlogs);
+    console.log(favorite);
+    expect(favorite).toStrictEqual({
+      title: 'Most Liked Blog',
+      author: 'Test Dummy 3',
+      likes: 900,
+    });
   });
 });
