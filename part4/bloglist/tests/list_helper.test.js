@@ -79,8 +79,16 @@ describe('favorite blog', () => {
     },
     {
       _id: '5a422aa71b54a676234d17f4',
-      title: 'Most Liked Blog',
+      title: 'First Most Liked Blog',
       author: 'Test Dummy 3',
+      url: 'http://www.asdasdasdasxcxzcg.com',
+      likes: 900,
+      __v: 0,
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Last Most Liked Blog',
+      author: 'Test Dummy 4',
       url: 'http://www.asdasdasdasxcxzcg.com',
       likes: 900,
       __v: 0,
@@ -105,8 +113,8 @@ describe('favorite blog', () => {
     const favorite = listHelper.favoriteBlog(listWithMultipleBlogs);
     console.log(favorite);
     expect(favorite).toStrictEqual({
-      title: 'Most Liked Blog',
-      author: 'Test Dummy 3',
+      title: 'Last Most Liked Blog',
+      author: 'Test Dummy 4',
       likes: 900,
     });
   });
