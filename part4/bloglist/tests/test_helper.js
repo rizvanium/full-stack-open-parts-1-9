@@ -21,17 +21,13 @@ const blogsInDb = async () => {
 };
 
 const getNonExistentId = async () => {
-  const blogs = await Blog.find({});
-  const id = blogs[0].id;
-  const tempBlog = {
-    title: blogs[0].title,
-    author: blogs[0].author,
-    url: blogs[0].url,
-    likes: blogs[0].likes,
-  };
-  await Blog.findByIdAndDelete(id);
-  await new Blog(tempBlog).save();
-  return id;
+  const blog = new Blog({ title: 'forid', url: 'whocares' });
+  await blog.save();
+  await Blog.findByIdAndDelete(blog._id.toString());
+
+  const blogs = await blogsInDb();
+  console.log('id:', blog._id.toString(), blogs);
+  return blog._id.toString();
 };
 
 module.exports = {

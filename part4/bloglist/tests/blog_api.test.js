@@ -130,7 +130,7 @@ describe('blogs api', () => {
       expect(blogs).toHaveLength(helper.blogsTestData.length - 1);
     });
 
-    test('fails to remove a blog and returns 400 bad request error when given invalid id', async () => {
+    test('fails to remove a blog and returns code: 400 bad request when given invalid id', async () => {
       const invalidId = '---invalid-fomat---';
       await api.delete(`/api/blogs/${invalidId}`).expect(400);
 
@@ -138,10 +138,10 @@ describe('blogs api', () => {
       expect(blogs).toHaveLength(helper.blogsTestData.length);
     });
 
-    test('fails to remove a blog and returns 404 not found error when given non-existent id', async () => {
+    test('fails to remove a blog and returns code: 204 no content when given non-existent id', async () => {
       const nonExistentId = await helper.getNonExistentId();
 
-      await api.delete(`/api/blogs/${nonExistentId}`).expect(400);
+      await api.delete(`/api/blogs/${nonExistentId}`).expect(204);
 
       const blogs = await helper.blogsInDb();
       expect(blogs).toHaveLength(helper.blogsTestData.length);
