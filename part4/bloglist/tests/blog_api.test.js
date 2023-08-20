@@ -34,6 +34,32 @@ describe('blogs api', () => {
     const response = await api.get('/api/blogs');
     response.body.forEach((blog) => expect(blog.id).toBeDefined());
   });
+
+  test('POST /api/blogs creates a valid blog post', async () => {
+    const newBlog = {
+      title: 'Test Blog 2 valid blog post',
+      author: 'Test Dummy',
+      url: 'http://www.somerandomblogurl.com',
+      likes: 1,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogs = await helper.blogsInDb();
+    expect(blogs).toHaveLength(helper.blogsTestData.length + 1);
+    expect(
+      blogs.map((blog) => ({
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes,
+      }))
+    ).toContainEqual(newBlog);
+  });
 });
 
 afterAll(async () => {
