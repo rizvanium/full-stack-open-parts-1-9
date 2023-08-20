@@ -37,7 +37,7 @@ describe('blogs api', () => {
 
   test('POST /api/blogs creates a valid blog post', async () => {
     const newBlog = {
-      title: 'Test Blog 2 valid blog post',
+      title: 'Valid blog post',
       author: 'Test Dummy',
       url: 'http://www.somerandomblogurl.com',
       likes: 1,
@@ -59,6 +59,60 @@ describe('blogs api', () => {
         likes: blog.likes,
       }))
     ).toContainEqual(newBlog);
+  });
+
+  test('POST /api/blogs creates a valid blog post when likes property is missing from the request', async () => {
+    const newBlog = {
+      title: 'Blog missing likes property',
+      author: 'Test Dummy',
+      url: 'http://www.somerandomblogurl.com',
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogs = await helper.blogsInDb();
+    expect(blogs).toHaveLength(helper.blogsTestData.length + 1);
+
+    const addedBlog = blogs.find((blog) => newBlog.title === blog.title);
+    expect(addedBlog.likes).toBe(0);
+  });
+
+  test('POST /api/blogs responds with 400 error when request is missing a [title] property', async () => {
+    const newBlog = {
+      author: 'Test Dummy',
+      url: 'http://www.somerandomblogurl.com',
+      likes: 5,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    const blogs = await helper.blogsInDb();
+    expect(blogs).toHaveLength(helper.blogsTestData.length);
+  });
+
+  test('POST /api/blogs responds with 400 error when request is missing a [url] property', async () => {
+    const newBlog = {
+      title: 'Blog missing likes property',
+      author: 'Test Dummy',
+      likes: 5,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    const blogs = await helper.blogsInDb();
+    expect(blogs).toHaveLength(helper.blogsTestData.length);
   });
 });
 
