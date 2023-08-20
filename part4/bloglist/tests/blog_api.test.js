@@ -120,7 +120,7 @@ describe('blogs api', () => {
   });
 
   describe('DELETE /api/blogs/:id', () => {
-    test('removes the selected blog post when given valid existing id', async () => {
+    test('removes the selected blog post returns code: [204 no content] when given valid existing id', async () => {
       let blogs = await helper.blogsInDb();
 
       const validId = blogs[0].id;
@@ -130,7 +130,7 @@ describe('blogs api', () => {
       expect(blogs).toHaveLength(helper.blogsTestData.length - 1);
     });
 
-    test('fails to remove a blog and returns code: 400 bad request when given invalid id', async () => {
+    test('fails to remove a blog and returns code: [400 bad request] when given invalid id', async () => {
       const invalidId = '---invalid-fomat---';
       await api.delete(`/api/blogs/${invalidId}`).expect(400);
 
@@ -138,7 +138,7 @@ describe('blogs api', () => {
       expect(blogs).toHaveLength(helper.blogsTestData.length);
     });
 
-    test('fails to remove a blog and returns code: 204 no content when given non-existent id', async () => {
+    test('fails to remove a blog and returns code: [204 no content] when given non-existent id', async () => {
       const nonExistentId = await helper.getNonExistentId();
 
       await api.delete(`/api/blogs/${nonExistentId}`).expect(204);
