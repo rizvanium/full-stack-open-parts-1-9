@@ -20,18 +20,27 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const getSpecificBlogInDb = async (id) => {
+  const blog = await Blog.findById(id);
+  return blog;
+};
+
+const getExistingId = async () => {
+  const blogs = await blogsInDb();
+  return blogs[0].id;
+};
+
 const getNonExistentId = async () => {
   const blog = new Blog({ title: 'forid', url: 'whocares' });
   await blog.save();
   await Blog.findByIdAndDelete(blog._id.toString());
-
-  const blogs = await blogsInDb();
-  console.log('id:', blog._id.toString(), blogs);
   return blog._id.toString();
 };
 
 module.exports = {
   blogsTestData,
+  getSpecificBlogInDb,
   blogsInDb,
+  getExistingId,
   getNonExistentId,
 };

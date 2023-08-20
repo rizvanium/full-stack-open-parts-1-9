@@ -147,6 +147,67 @@ describe('blogs api', () => {
       expect(blogs).toHaveLength(helper.blogsTestData.length);
     });
   });
+
+  describe('PUT /api/blogs/:id', () => {
+    test('successfully updates existing blog and ignores additional properties', async () => {
+      let id = await helper.getExistingId();
+      const blogBefore = await helper.getSpecificBlogInDb(id);
+
+      let blogUpdates = {
+        title: 'update',
+        additional: 'should-not-contain-this',
+      };
+
+      await api
+        .put(`/api/blogs/${id}`)
+        .send(blogUpdates)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
+      const blogAfter = await helper.getSpecificBlogInDb(id);
+
+      expect(blogAfter.title).toBe(blogUpdates.title);
+
+      expect(blogAfter.author).toBe(blogBefore.author);
+      expect(blogAfter.url).toBe(blogBefore.url);
+      expect(blogAfter.likes).toBe(blogBefore.likes);
+
+      expect(blogAfter.additional).toBeUndefined();
+    });
+
+    test('fails to update on validation fail', async () => {
+      let id = await helper.getExistingId();
+      const blogBefore = await helper.getSpecificBlogInDb(id);
+
+      let blogUpdates = {
+        title: '',
+      };
+
+      await api.put(`/api/blogs/${id}`).send(blogUpdates).expect(400);
+
+      const blogAfter = await helper.getSpecificBlogInDb(id);
+
+      expect(blogAfter).toStrictEqual(blogBefore);
+    });
+
+    test('fails to update non-existent blog', async () => {
+      const blogsBefore = await helper.blogsInDb();
+
+      let id = await helper.getNonExistentId();
+      let blogUpdates = {
+        title: 'update',
+        additional: 'should-not-contain-this',
+      };
+
+      await api.put(`/api/blogs/${id}`).send(blogUpdates).expect(404);
+
+      const blogsAfter = await helper.blogsInDb();
+
+      blogsAfter.forEach((blog, idx) => {
+        expect(blog).toStrictEqual(blogsBefore[idx]);
+      });
+    });
+  });
 });
 
 afterAll(async () => {
