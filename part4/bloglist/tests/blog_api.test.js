@@ -29,6 +29,11 @@ describe('blogs api', () => {
     const titles = response.body.map((blog) => blog.title);
     expect(titles).toContain(helper.blogsTestData[0].title);
   });
+
+  test('GET /api/blogs every blog contains id property', async () => {
+    const response = await api.get('/api/blogs');
+    response.body.forEach((blog) => expect(blog.id).toBeDefined());
+  });
 });
 
 afterAll(async () => {
