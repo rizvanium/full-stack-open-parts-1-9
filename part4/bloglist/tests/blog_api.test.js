@@ -121,12 +121,10 @@ describe('blogs api', () => {
 
   describe('DELETE /api/blogs/:id', () => {
     test('removes the selected blog post returns code: [204 no content] when given valid existing id', async () => {
-      let blogs = await helper.blogsInDb();
-
-      const validId = blogs[0].id;
+      const validId = await helper.getExistingId();
       await api.delete(`/api/blogs/${validId}`).expect(204);
 
-      blogs = await helper.blogsInDb();
+      const blogs = await helper.blogsInDb();
       expect(blogs).toHaveLength(helper.blogsTestData.length - 1);
     });
 
