@@ -9,7 +9,8 @@ Content-Type: application/json
   "title": "Test Blog 2",
   "author": "Rizvan",
   "url": "test-url",
-  "likes": 0
+  "likes": 0,
+  "userId":"64e3b5967181169a161b223a"
 }
 
 ###
