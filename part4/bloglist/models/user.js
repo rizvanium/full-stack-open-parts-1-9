@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  userName: {
+  username: {
     type: String,
     required: true,
   },
@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
   blogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }],
 });
 
-userSchema.blogSchema.set('toJSON', {
+userSchema.set('toJSON', {
   transform: (doc, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
