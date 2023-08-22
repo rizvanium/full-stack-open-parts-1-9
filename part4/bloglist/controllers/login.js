@@ -27,11 +27,14 @@ loginRouter.post('/', async (request, response, next) => {
 
     const token = jwt.sign(userInfo, config.SECRET);
 
-    response.json({
-      token,
-      username: user.username,
-      name: user.name,
-    });
+    response.json(
+      {
+        token,
+        username: user.username,
+        name: user.name,
+      },
+      { expiresIn: 3600 }
+    );
   } catch (error) {
     next(error);
   }
