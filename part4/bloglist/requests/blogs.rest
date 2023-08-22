@@ -4,9 +4,7 @@ GET http://localhost:3003/api/blogs
 ###
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTNiNTk2NzE4MTE2OWExNjFiMjIzYSIsInVzZXJuYW1lIjoidGVzdGl1bSIsImlhdCI6MTY5MjczMDI1MywiZXhwIjoxNjkyNzMzODUzfQ.fpJ3M0kLf9LrUZCLVmEeq8TTZbzJuR6CWmG2kkOHdNY
-
-{
+Authorization: Bearer dont.look
   "title": "Test Blog 4",
   "url": "test-url",
   "likes": 0
@@ -14,3 +12,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTNiNTk2N
 
 ###
 GET http://localhost:3003/api/non-existant
+
+###
+DELETE http://localhost:3003/api/blogs/64e5086abcb32680bacac288
+Authorization: Bearer who.cares
