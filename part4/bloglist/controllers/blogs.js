@@ -1,8 +1,6 @@
-const jwt = require('jsonwebtoken');
-const config = require('../utils/config');
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
-const User = require('../models/user');
+const middleware = require('../utils/middleware');
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
@@ -17,59 +15,50 @@ blogsRouter.get('/', async (request, response, next) => {
   }
 });
 
-blogsRouter.post('/', async (request, response, next) => {
-  try {
-    const decodedToken = jwt.verify(request.token, config.SECRET);
-    if (!decodedToken.id) {
-      response.status(401).json({
-        error: 'JWT invalid',
+blogsRouter.post(
+  '/',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    try {
+      const body = request.body;
+
+      const blog = new Blog({
+        ...body,
+        author: request.user.name ?? 'unknown',
+        likes: body.likes ?? 0,
+        user: request.user.id,
       });
+
+      const newBlog = await blog.save();
+
+      request.user.blogs = request.user.blogs.concat(newBlog.id);
+      await request.user.save();
+
+      response.status(201).json(newBlog);
+    } catch (error) {
+      next(error);
     }
-
-    const user = await User.findById(decodedToken.id);
-
-    const body = request.body;
-
-    const blog = new Blog({
-      ...body,
-      author: user.name ?? 'unknown',
-      likes: body.likes ?? 0,
-      user: user.id,
-    });
-
-    const newBlog = await blog.save();
-
-    user.blogs = user.blogs.concat(newBlog.id);
-    await user.save();
-
-    response.status(201).json(newBlog);
-  } catch (error) {
-    next(error);
   }
-});
+);
 
-blogsRouter.delete('/:id', async (request, response, next) => {
-  try {
-    const decodedToken = jwt.verify(request.token, config.SECRET);
-    if (!decodedToken.id) {
-      response.status(401).json({
-        error: 'JWT invalid',
-      });
+blogsRouter.delete(
+  '/:id',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    try {
+      const userBlogIds = request.user.blogs.map((b) => b._id.toString());
+      if (!userBlogIds.includes(request.params.id)) {
+        response.status(401).json({
+          error: 'unauthorized blog operation',
+        });
+      }
+      await Blog.findByIdAndDelete(request.params.id);
+      response.status(204).end();
+    } catch (error) {
+      next(error);
     }
-
-    const user = await User.findById(decodedToken.id);
-    const userBlogIds = user.blogs.map((b) => b._id.toString());
-    if (!userBlogIds.includes(request.params.id)) {
-      response.status(401).json({
-        error: 'unauthorized blog operation',
-      });
-    }
-    await Blog.findByIdAndDelete(request.params.id);
-    response.status(204).end();
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 blogsRouter.put('/:id', async (request, response, next) => {
   const body = request.body;
