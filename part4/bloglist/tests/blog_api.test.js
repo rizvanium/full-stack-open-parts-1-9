@@ -206,6 +206,35 @@ describe('blogs api', () => {
       });
     });
   });
+
+  describe('GET /api/users', () => {
+    test('returns users as json', async () => {
+      await api
+        .get('/api/users')
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+    });
+
+    test('returns all users', async () => {
+      const response = await api.get('/api/users');
+      expect(response.body).toHaveLength(helper.blogsTestData.length);
+    });
+  });
+
+  describe('POST /api/users', () => {
+    test('creates new user when given valid request', async () => {});
+    test('fails to create new user when request is missing username', async () => {});
+    test('fails to create new user when request is missing password', async () => {});
+    test('fails to create new user when username is baddly formatted', async () => {});
+    test('fails to create new user when password is baddly formatted', async () => {});
+    test('fails to create new user when given non unique username', async () => {});
+  });
+
+  describe('POST /api/login', () => {
+    test('returns a [valid JWT] when given valid username and password', async () => {});
+    test('returns [401 unauthorized] when given non-existent username', async () => {});
+    test('returns [401 unauthorized] when given wrong password', async () => {});
+  });
 });
 
 afterAll(async () => {
