@@ -7,8 +7,7 @@ const Blog = require('../models/blog');
 const api = supertest(app);
 
 beforeEach(async () => {
-  await Blog.deleteMany({});
-  await Blog.insertMany(helper.blogsTestData);
+  await helper.resetDb();
 });
 
 describe('blogs api', () => {
