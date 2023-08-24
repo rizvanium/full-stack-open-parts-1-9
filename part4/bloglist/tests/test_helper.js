@@ -97,6 +97,11 @@ const getSpecificBlogInDb = async (id) => {
   return blog;
 };
 
+const getSpecificUserInDb = async (username) => {
+  const blog = await User.findOne({ username });
+  return blog;
+};
+
 const getExistingId = async () => {
   const blogs = await blogsInDb();
   return blogs[0].id;
@@ -113,6 +118,7 @@ module.exports = {
   data,
   resetDb,
   getSpecificBlogInDb,
+  getSpecificUserInDb,
   blogsInDb,
   usersInDb,
   getExistingId,

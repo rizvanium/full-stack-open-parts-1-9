@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
+const jwt = require('jsonwebtoken');
 const app = require('../app');
 const helper = require('./test_helper');
 const Blog = require('../models/blog');
+const config = require('../utils/config');
 
 const api = supertest(app);
 
@@ -307,7 +309,35 @@ describe('blogs api', () => {
 
   describe('POST /api/login', () => {
     describe('returns a [valid JWT]', () => {
-      test('when given valid username and password', async () => {});
+      test('when given valid existing username and password', async () => {
+        const loginRequest = {
+          username: helper.data.users[0].username,
+          password: helper.data.users[0].password,
+        };
+        const { body } = await api
+          .post('/api/login')
+          .send(loginRequest)
+          .expect(200)
+          .expect('Content-Type', /application\/json/);
+
+        const { token, username, name } = body;
+
+        expect(username).toBe(helper.data.users[0].username);
+        expect(name).toBe(helper.data.users[0].name);
+        expect(token).toBeDefined();
+
+        const user = await helper.getSpecificUserInDb(username);
+        const userInfo = {
+          id: user._id.toString(),
+          username: user.username,
+        };
+
+        const testToken = jwt.sign(userInfo, config.SECRET, {
+          expiresIn: 3600,
+        });
+
+        expect(token).toBe(testToken);
+      });
     });
 
     describe('returns [401 unauthorized]', () => {
