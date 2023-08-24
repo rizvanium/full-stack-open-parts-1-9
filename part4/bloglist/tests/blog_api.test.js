@@ -341,8 +341,33 @@ describe('blogs api', () => {
     });
 
     describe('returns [401 unauthorized]', () => {
-      test('when given non-existent username', async () => {});
-      test('when given wrong password', async () => {});
+      const checkFailsToLogin = async (request, status) => {
+        await api
+          .post('/api/login')
+          .send(request)
+          .expect(status)
+          .expect('Content-Type', /application\/json/);
+      };
+
+      test('when given non-existent username', async () => {
+        const loginRequest = {
+          username: 'nonExistent',
+          password: 'whoCares',
+        };
+        await checkFailsToLogin(loginRequest, 401);
+      });
+
+      test('when given wrong password', async () => {
+        const loginRequest = {
+          username: helper.data.users[0].username,
+          password: 'wrongPassword123',
+        };
+        await checkFailsToLogin(loginRequest, 401);
+      });
+
+      test('when given empty request body', async () => {
+        await checkFailsToLogin({}, 401);
+      });
     });
   });
 });
