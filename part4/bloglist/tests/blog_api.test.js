@@ -208,165 +208,166 @@ describe('blogs api', () => {
     });
   });
 
-  describe('GET /api/users', () => {
-    test('returns users as json', async () => {
-      await api
-        .get('/api/users')
-        .expect(200)
-        .expect('Content-Type', /application\/json/);
-    });
-
-    test('returns all users', async () => {
-      const response = await api.get('/api/users');
-      expect(response.body).toHaveLength(helper.blogsTestData.length);
-    });
-  });
-
-  describe('POST /api/users', () => {
-    describe('creates new user', () => {
-      test('when given a valid request', async () => {
-        const userRequest = {
-          username: 'uniqueName',
-          name: 'Unique Test Dummy',
-          password: 'veryStrongPassword123',
-        };
-
-        await api
-          .post('/api/users')
-          .send(userRequest)
-          .expect(201)
-          .expect('Content-Type', /application\/json/);
-
-        const users = await helper.usersInDb();
-        expect(users).toHaveLength(helper.data.users.length + 1);
-        expect(users.map((user) => user.username)).toContain(
-          userRequest.username
-        );
-      });
-    });
-
-    describe('fails to create new user', () => {
-      const checkFailureToAddUser = async (request, code) => {
-        await api
-          .post('/api/users')
-          .send(request)
-          .expect(code)
-          .expect('Content-Type', /application\/json/);
-
-        const users = await helper.usersInDb();
-        expect(users).toHaveLength(helper.data.users.length);
-      };
-
-      test('when request is missing a username', async () => {
-        const userRequest = {
-          name: 'Unique Test Dummy',
-          password: 'veryStrongPassword123',
-        };
-
-        await checkFailureToAddUser(userRequest, 400);
-      });
-
-      test('when request is missing a password', async () => {
-        const userRequest = {
-          username: 'uniqueName',
-          name: 'Unique Test Dummy',
-        };
-
-        await checkFailureToAddUser(userRequest, 400);
-      });
-
-      test('when username is baddly formatted', async () => {
-        const userRequest = {
-          username: 'un',
-          name: 'Unique Test Dummy',
-          password: 'veryStrongPassword123',
-        };
-
-        await checkFailureToAddUser(userRequest, 400);
-      });
-
-      test('when password is baddly formatted', async () => {
-        const userRequest = {
-          username: 'uniqueName',
-          name: 'Unique Test Dummy',
-          password: 've',
-        };
-
-        await checkFailureToAddUser(userRequest, 400);
-      });
-
-      test('when given non unique username', async () => {
-        const userRequest = {
-          username: helper.data.users[0].username,
-          name: 'Unique Test Dummy',
-          password: 'veryStrongPassword123',
-        };
-
-        await checkFailureToAddUser(userRequest, 400);
-      });
-    });
-  });
-
-  describe('POST /api/login', () => {
-    describe('returns a [valid JWT]', () => {
-      test('when given valid existing username and password', async () => {
-        const loginRequest = {
-          username: helper.data.users[0].username,
-          password: helper.data.users[0].password,
-        };
-        const { body } = await api
-          .post('/api/login')
-          .send(loginRequest)
+  describe('USERS', () => {
+    describe('GET /api/users', () => {
+      test('returns all users in json format', async () => {
+        const response = await api
+          .get('/api/users')
           .expect(200)
           .expect('Content-Type', /application\/json/);
 
-        const { token, username, name } = body;
-
-        expect(username).toBe(helper.data.users[0].username);
-        expect(name).toBe(helper.data.users[0].name);
-        expect(token).toBeDefined();
-
-        const user = await helper.getSpecificUserInDb(username);
-        const userInfo = {
-          id: user._id.toString(),
-          username: user.username,
-        };
-
-        const testToken = jwt.sign(userInfo, config.SECRET, {
-          expiresIn: 3600,
-        });
-
-        expect(token).toBe(testToken);
+        expect(response.body).toHaveLength(helper.data.users.length);
       });
     });
 
-    describe('returns [401 unauthorized]', () => {
-      const checkFailsToLogin = async (request, status) => {
-        await api
-          .post('/api/login')
-          .send(request)
-          .expect(status)
-          .expect('Content-Type', /application\/json/);
-      };
+    describe('POST /api/users', () => {
+      describe('creates new user', () => {
+        test('when given a valid request', async () => {
+          const userRequest = {
+            username: 'uniqueName',
+            name: 'Unique Test Dummy',
+            password: 'veryStrongPassword123',
+          };
 
-      test('when given non-existent username', async () => {
-        const loginRequest = {
-          username: 'nonExistent',
-          password: 'whoCares',
-        };
-        await checkFailsToLogin(loginRequest, 401);
+          await api
+            .post('/api/users')
+            .send(userRequest)
+            .expect(201)
+            .expect('Content-Type', /application\/json/);
+
+          const users = await helper.usersInDb();
+          expect(users).toHaveLength(helper.data.users.length + 1);
+          expect(users.map((user) => user.username)).toContain(
+            userRequest.username
+          );
+        });
       });
 
-      test('when given wrong password', async () => {
-        const loginRequest = {
-          username: helper.data.users[0].username,
-          password: 'wrongPassword123',
+      describe('fails to create new user', () => {
+        const checkFailureToAddUser = async (request, code) => {
+          await api
+            .post('/api/users')
+            .send(request)
+            .expect(code)
+            .expect('Content-Type', /application\/json/);
+
+          const users = await helper.usersInDb();
+          expect(users).toHaveLength(helper.data.users.length);
         };
-        await checkFailsToLogin(loginRequest, 401);
+
+        test('when request is missing a username', async () => {
+          const userRequest = {
+            name: 'Unique Test Dummy',
+            password: 'veryStrongPassword123',
+          };
+
+          await checkFailureToAddUser(userRequest, 400);
+        });
+
+        test('when request is missing a password', async () => {
+          const userRequest = {
+            username: 'uniqueName',
+            name: 'Unique Test Dummy',
+          };
+
+          await checkFailureToAddUser(userRequest, 400);
+        });
+
+        test('when username is baddly formatted', async () => {
+          const userRequest = {
+            username: 'un',
+            name: 'Unique Test Dummy',
+            password: 'veryStrongPassword123',
+          };
+
+          await checkFailureToAddUser(userRequest, 400);
+        });
+
+        test('when password is baddly formatted', async () => {
+          const userRequest = {
+            username: 'uniqueName',
+            name: 'Unique Test Dummy',
+            password: 've',
+          };
+
+          await checkFailureToAddUser(userRequest, 400);
+        });
+
+        test('when given non unique username', async () => {
+          const userRequest = {
+            username: helper.data.users[0].username,
+            name: 'Unique Test Dummy',
+            password: 'veryStrongPassword123',
+          };
+
+          await checkFailureToAddUser(userRequest, 400);
+        });
+      });
+    });
+  });
+
+  describe('LOGIN', () => {
+    describe('POST /api/login', () => {
+      describe('returns a [valid JWT]', () => {
+        test('when given valid existing username and password', async () => {
+          const loginRequest = {
+            username: helper.data.users[0].username,
+            password: helper.data.users[0].password,
+          };
+          const { body } = await api
+            .post('/api/login')
+            .send(loginRequest)
+            .expect(200)
+            .expect('Content-Type', /application\/json/);
+
+          const { token, username, name } = body;
+
+          expect(username).toBe(helper.data.users[0].username);
+          expect(name).toBe(helper.data.users[0].name);
+          expect(token).toBeDefined();
+
+          const user = await helper.getSpecificUserInDb(username);
+          const userInfo = {
+            id: user._id.toString(),
+            username: user.username,
+          };
+
+          const testToken = jwt.sign(userInfo, config.SECRET, {
+            expiresIn: 3600,
+          });
+
+          expect(token).toBe(testToken);
+        });
       });
 
-      test('when given empty request body', async () => {
-        await checkFailsToLogin({}, 401);
+      describe('returns [401 unauthorized]', () => {
+        const checkFailsToLogin = async (request, status) => {
+          await api
+            .post('/api/login')
+            .send(request)
+            .expect(status)
+            .expect('Content-Type', /application\/json/);
+        };
+
+        test('when given non-existent username', async () => {
+          const loginRequest = {
+            username: 'nonExistent',
+            password: 'whoCares',
+          };
+          await checkFailsToLogin(loginRequest, 401);
+        });
+
+        test('when given wrong password', async () => {
+          const loginRequest = {
+            username: helper.data.users[0].username,
+            password: 'wrongPassword123',
+          };
+          await checkFailsToLogin(loginRequest, 401);
+        });
+
+        test('when given empty request body', async () => {
+          await checkFailsToLogin({}, 401);
+        });
       });
     });
   });
