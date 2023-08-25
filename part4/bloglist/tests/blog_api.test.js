@@ -43,7 +43,7 @@ describe('BLOGS', () => {
         .expect(expectedStatus)
         .expect('Content-Type', /application\/json/);
 
-      if (expectedStatus === 400) return;
+      if (expectedStatus === 400) return {};
 
       const blog = await helper.getBlogFromDb(response.body.id);
       expect(blog).toBeDefined();
@@ -53,6 +53,8 @@ describe('BLOGS', () => {
       expect(user.blogs.map((blog) => blog._id.toString())).toContain(
         blog._id.toString()
       );
+
+      return { blog, user };
     };
 
     describe('creates a valid blog', () => {
@@ -83,57 +85,49 @@ describe('BLOGS', () => {
           user: authData.user._id.toString(),
         };
 
-        const response = await api
-          .post('/api/blogs')
-          .set('Authorization', authData ? `Bearer ${authData.token}` : '')
-          .send(blogRequest)
-          .expect(201)
-          .expect('Content-Type', /application\/json/);
-
-        const blog = await helper.getBlogFromDb(response.body.id);
-        expect(blog).toBeDefined();
-
-        const user = await helper.getUserFromDb(authData.user.username);
-        expect(blog.user.toString()).toBe(user._id.toString());
-        expect(user.blogs.map((blog) => blog._id.toString())).toContain(
-          blog._id.toString()
-        );
-        expect(blog.likes).toBe(0);
+        const { blog } = await checkBlogCreation(blogRequest, 201, authData);
+        if (blog) {
+          expect(blog.likes).toBe(0);
+        }
       });
     });
 
-    test('responds with 400 error when a request is missing a [title] property', async () => {
-      const newBlog = {
-        author: 'Test Dummy',
-        url: 'http://www.somerandomblogurl.com',
-        likes: 5,
-      };
+    describe('fails to create blog', () => {
+      test('when a request is missing a [title] property', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[0].username
+        );
 
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-        .expect('Content-Type', /application\/json/);
+        const blogRequest = {
+          author: 'Test Dummy',
+          url: 'http://www.somerandomblogurl.com',
+          likes: 5,
+          user: authData.user._id.toString(),
+        };
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length);
-    });
+        await checkBlogCreation(blogRequest, 400, authData);
 
-    test('responds with 400 error when a request is missing a [url] property', async () => {
-      const newBlog = {
-        title: 'Blog missing likes property',
-        author: 'Test Dummy',
-        likes: 5,
-      };
+        const blogs = await helper.blogsInDb();
+        expect(blogs).toHaveLength(helper.data.blogs.length);
+      });
 
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-        .expect('Content-Type', /application\/json/);
+      test('when a request is missing a [url] property', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[0].username
+        );
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length);
+        const blogRequest = {
+          title: 'Blog missing url property',
+          author: 'Test Dummy',
+          likes: 5,
+          user: authData.user._id.toString(),
+        };
+
+        await checkBlogCreation(blogRequest, 400, authData);
+
+        const blogs = await helper.blogsInDb();
+        expect(blogs).toHaveLength(helper.data.blogs.length);
+      });
     });
   });
 
