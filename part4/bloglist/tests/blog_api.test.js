@@ -12,24 +12,20 @@ beforeEach(async () => {
   await helper.resetDb();
 });
 
-describe('blogs api', () => {
+describe('BLOGS', () => {
   describe('GET /api/blogs', () => {
-    test('returns blogs as json', async () => {
-      await api
+    test('returns all blogs in json format', async () => {
+      const response = await api
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/);
-    });
-
-    test('returns all blogs', async () => {
-      const response = await api.get('/api/blogs');
-      expect(response.body).toHaveLength(helper.blogsTestData.length);
+      expect(response.body).toHaveLength(helper.data.blogs.length);
     });
 
     test('contains specific blog', async () => {
       const response = await api.get('/api/blogs');
       const titles = response.body.map((blog) => blog.title);
-      expect(titles).toContain(helper.blogsTestData[0].title);
+      expect(titles).toContain(helper.data.blogs[0].title);
     });
 
     test('every blog contains id property', async () => {
@@ -39,50 +35,71 @@ describe('blogs api', () => {
   });
 
   describe('POST /api/blogs', () => {
-    test('creates a valid blog post', async () => {
-      const newBlog = {
-        title: 'Valid blog post',
-        author: 'Test Dummy',
-        url: 'http://www.somerandomblogurl.com',
-        likes: 1,
-      };
-
-      await api
+    const checkBlogCreation = async (request, expectedStatus, authData) => {
+      const response = await api
         .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
+        .set('Authorization', authData ? `Bearer ${authData.token}` : '')
+        .send(request)
+        .expect(expectedStatus)
         .expect('Content-Type', /application\/json/);
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length + 1);
-      expect(
-        blogs.map((blog) => ({
-          title: blog.title,
-          author: blog.author,
-          url: blog.url,
-          likes: blog.likes,
-        }))
-      ).toContainEqual(newBlog);
-    });
+      if (expectedStatus === 400) return;
 
-    test('creates a valid blog post when a request is missing [likes] property', async () => {
-      const newBlog = {
-        title: 'Blog missing likes property',
-        author: 'Test Dummy',
-        url: 'http://www.somerandomblogurl.com',
-      };
+      const blog = await helper.getBlogFromDb(response.body.id);
+      expect(blog).toBeDefined();
 
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/);
+      const user = await helper.getUserFromDb(authData.user.username);
+      expect(blog.user.toString()).toBe(user._id.toString());
+      expect(user.blogs.map((blog) => blog._id.toString())).toContain(
+        blog._id.toString()
+      );
+    };
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length + 1);
+    describe('creates a valid blog', () => {
+      test('when given a valid request', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[0].username
+        );
 
-      const addedBlog = blogs.find((blog) => newBlog.title === blog.title);
-      expect(addedBlog.likes).toBe(0);
+        const blogRequest = {
+          title: 'Valid blog post',
+          url: 'http://www.somerandomblogurl.om',
+          likes: 1,
+          user: authData.user._id.toString(),
+        };
+
+        await checkBlogCreation(blogRequest, 201, authData);
+      });
+
+      test('when a request is missing [likes] property', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[0].username
+        );
+
+        const blogRequest = {
+          title: 'Blog missing likes property',
+          author: 'Test Dummy',
+          url: 'http://www.somerandomblogurl.com',
+          user: authData.user._id.toString(),
+        };
+
+        const response = await api
+          .post('/api/blogs')
+          .set('Authorization', authData ? `Bearer ${authData.token}` : '')
+          .send(blogRequest)
+          .expect(201)
+          .expect('Content-Type', /application\/json/);
+
+        const blog = await helper.getBlogFromDb(response.body.id);
+        expect(blog).toBeDefined();
+
+        const user = await helper.getUserFromDb(authData.user.username);
+        expect(blog.user.toString()).toBe(user._id.toString());
+        expect(user.blogs.map((blog) => blog._id.toString())).toContain(
+          blog._id.toString()
+        );
+        expect(blog.likes).toBe(0);
+      });
     });
 
     test('responds with 400 error when a request is missing a [title] property', async () => {
@@ -150,7 +167,7 @@ describe('blogs api', () => {
   describe('PUT /api/blogs/:id', () => {
     test('successfully updates existing blog and ignores additional properties', async () => {
       let id = await helper.getExistingId();
-      const blogBefore = await helper.getSpecificBlogInDb(id);
+      const blogBefore = await helper.getBlogFromDb(id);
 
       let blogUpdates = {
         title: 'update',
@@ -163,7 +180,7 @@ describe('blogs api', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/);
 
-      const blogAfter = await helper.getSpecificBlogInDb(id);
+      const blogAfter = await helper.getBlogFromDb(id);
 
       expect(blogAfter.title).toBe(blogUpdates.title);
 
@@ -176,7 +193,7 @@ describe('blogs api', () => {
 
     test('fails to update on validation fail', async () => {
       let id = await helper.getExistingId();
-      const blogBefore = await helper.getSpecificBlogInDb(id);
+      const blogBefore = await helper.getBlogFromDb(id);
 
       let blogUpdates = {
         title: '',
@@ -184,7 +201,7 @@ describe('blogs api', () => {
 
       await api.put(`/api/blogs/${id}`).send(blogUpdates).expect(400);
 
-      const blogAfter = await helper.getSpecificBlogInDb(id);
+      const blogAfter = await helper.getBlogFromDb(id);
 
       expect(blogAfter).toStrictEqual(blogBefore);
     });
@@ -326,7 +343,7 @@ describe('blogs api', () => {
           expect(name).toBe(helper.data.users[0].name);
           expect(token).toBeDefined();
 
-          const user = await helper.getSpecificUserInDb(username);
+          const user = await helper.getUserFromDb(username);
           const userInfo = {
             id: user._id.toString(),
             username: user.username,

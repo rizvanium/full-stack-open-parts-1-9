@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const config = require('../utils/config');
 const Blog = require('../models/blog');
 const User = require('../models/user');
@@ -92,12 +93,12 @@ const usersInDb = async () => {
   return users.map((user) => user.toJSON());
 };
 
-const getSpecificBlogInDb = async (id) => {
+const getBlogFromDb = async (id) => {
   const blog = await Blog.findById(id);
   return blog;
 };
 
-const getSpecificUserInDb = async (username) => {
+const getUserFromDb = async (username) => {
   const blog = await User.findOne({ username });
   return blog;
 };
@@ -114,13 +115,25 @@ const getNonExistentId = async () => {
   return blog._id.toString();
 };
 
+const getUserAuthData = async (username) => {
+  const user = await getUserFromDb(username);
+  const userInfo = {
+    id: user._id.toString(),
+    username: user.username,
+  };
+  const token = jwt.sign(userInfo, config.SECRET, { expiresIn: 3600 });
+
+  return { user: user, token };
+};
+
 module.exports = {
   data,
   resetDb,
-  getSpecificBlogInDb,
-  getSpecificUserInDb,
+  getBlogFromDb,
+  getUserFromDb,
   blogsInDb,
   usersInDb,
   getExistingId,
   getNonExistentId,
+  getUserAuthData,
 };
