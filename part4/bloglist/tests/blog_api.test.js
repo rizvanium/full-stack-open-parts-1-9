@@ -164,7 +164,7 @@ describe('BLOGS', () => {
         const invalidId = '---invalid-fomat---';
         await checkBlogDeletion(invalidId, 400, authData, false);
       });
-      // TODO: RETURN HERE AND FIX
+
       test('when given non-existent id', async () => {
         const authData = await helper.getUserAuthData(
           helper.data.users[1].username
