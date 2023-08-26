@@ -131,9 +131,14 @@ describe('BLOGS', () => {
   });
 
   describe('DELETE /api/blogs/:id', () => {
-    const checkBlogDeletion = async (id, code, authData, success = true) => {
+    const checkBlogDeletion = async (
+      blogId,
+      authData,
+      code,
+      success = true
+    ) => {
       await api
-        .delete(`/api/blogs/${id}`)
+        .delete(`/api/blogs/${blogId}`)
         .set('Authorization', authData ? `Bearer ${authData.token}` : '')
         .expect(code);
 
@@ -151,7 +156,7 @@ describe('BLOGS', () => {
         );
 
         const validId = authData.user.blogs[0];
-        await checkBlogDeletion(validId, 204, authData);
+        await checkBlogDeletion(validId, authData, 204);
       });
     });
 
@@ -162,7 +167,7 @@ describe('BLOGS', () => {
         );
 
         const invalidId = '---invalid-fomat---';
-        await checkBlogDeletion(invalidId, 400, authData, false);
+        await checkBlogDeletion(invalidId, authData, 400, false);
       });
 
       test('when given non-existent id', async () => {
@@ -171,7 +176,7 @@ describe('BLOGS', () => {
         );
 
         const nonExistentId = await helper.getNonExistentId();
-        await checkBlogDeletion(nonExistentId, 204, authData, false);
+        await checkBlogDeletion(nonExistentId, authData, 204, false);
       });
 
       test('that does not belong to a user', async () => {
@@ -183,7 +188,7 @@ describe('BLOGS', () => {
           (blog) => blog.user.toString() !== authData.user._id.toString()
         ).id;
 
-        await checkBlogDeletion(id, 401, authData, false);
+        await checkBlogDeletion(id, authData, 401, false);
       });
 
       test('of an unauthenticated user', async () => {
@@ -192,7 +197,7 @@ describe('BLOGS', () => {
         );
 
         const validId = authData.user.blogs[0];
-        await checkBlogDeletion(validId, 401, null, false);
+        await checkBlogDeletion(validId, null, 401, false);
       });
     });
   });

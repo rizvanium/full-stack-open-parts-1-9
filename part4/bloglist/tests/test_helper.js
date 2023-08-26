@@ -99,8 +99,8 @@ const getBlogFromDb = async (id) => {
 };
 
 const getUserFromDb = async (username) => {
-  const blog = await User.findOne({ username });
-  return blog;
+  const user = await User.findOne({ username });
+  return user;
 };
 
 const getExistingId = async () => {
@@ -123,6 +123,9 @@ const getNonExistentId = async () => {
 
 const getUserAuthData = async (username) => {
   const user = await getUserFromDb(username);
+  if (!user) {
+    return null;
+  }
   const userInfo = {
     id: user._id.toString(),
     username: user.username,
