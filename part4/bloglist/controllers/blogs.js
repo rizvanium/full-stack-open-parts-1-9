@@ -46,8 +46,11 @@ blogsRouter.delete(
   middleware.userExtractor,
   async (request, response, next) => {
     try {
-      const userBlogIds = request.user.blogs.map((b) => b._id.toString());
-      if (!userBlogIds.includes(request.params.id)) {
+      const blog = await Blog.findById(request.params.id);
+      if (!blog) {
+        response.status(204).end();
+      }
+      if (blog.user.toString() !== request.user.id) {
         response.status(401).json({
           error: 'unauthorized blog operation',
         });
