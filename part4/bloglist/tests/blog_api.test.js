@@ -3,7 +3,6 @@ const supertest = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../app');
 const helper = require('./test_helper');
-const Blog = require('../models/blog');
 const config = require('../utils/config');
 
 const api = supertest(app);
@@ -132,29 +131,69 @@ describe('BLOGS', () => {
   });
 
   describe('DELETE /api/blogs/:id', () => {
-    test('removes the selected blog post returns code: [204 no content] when given valid existing id', async () => {
-      const validId = await helper.getExistingId();
-      await api.delete(`/api/blogs/${validId}`).expect(204);
+    const checkBlogDeletion = async (id, code, authData, success = true) => {
+      await api
+        .delete(`/api/blogs/${id}`)
+        .set('Authorization', authData ? `Bearer ${authData.token}` : '')
+        .expect(code);
+
+      const seedLength = helper.data.blogs.length;
+      const expectedLength = success ? seedLength - 1 : seedLength;
 
       const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length - 1);
+      expect(blogs).toHaveLength(expectedLength);
+    };
+
+    describe('successfully removes blog', () => {
+      test('when given a valid existing id', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[1].username
+        );
+
+        const validId = authData.user.blogs[0];
+        await checkBlogDeletion(validId, 204, authData);
+      });
     });
 
-    test('fails to remove a blog and returns code: [400 bad request] when given invalid id', async () => {
-      const invalidId = '---invalid-fomat---';
-      await api.delete(`/api/blogs/${invalidId}`).expect(400);
+    describe('fails to remove a blog', () => {
+      test('when given an invalid id', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[1].username
+        );
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length);
-    });
+        const invalidId = '---invalid-fomat---';
+        await checkBlogDeletion(invalidId, 400, authData, false);
+      });
+      // TODO: RETURN HERE AND FIX
+      test('when given non-existent id', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[1].username
+        );
 
-    test('fails to remove a blog and returns code: [204 no content] when given non-existent id', async () => {
-      const nonExistentId = await helper.getNonExistentId();
+        const nonExistentId = await helper.getNonExistentId();
+        await checkBlogDeletion(nonExistentId, 204, authData, false);
+      });
 
-      await api.delete(`/api/blogs/${nonExistentId}`).expect(204);
+      test('that does not belong to a user', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[1].username
+        );
+        const blogs = await helper.blogsInDb();
+        const id = await blogs.find(
+          (blog) => blog.user.toString() !== authData.user._id.toString()
+        ).id;
 
-      const blogs = await helper.blogsInDb();
-      expect(blogs).toHaveLength(helper.blogsTestData.length);
+        await checkBlogDeletion(id, 401, authData, false);
+      });
+
+      test('of an unauthenticated user', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[1].username
+        );
+
+        const validId = authData.user.blogs[0];
+        await checkBlogDeletion(validId, 401, null, false);
+      });
     });
   });
 

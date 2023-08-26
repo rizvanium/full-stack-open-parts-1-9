@@ -109,7 +109,13 @@ const getExistingId = async () => {
 };
 
 const getNonExistentId = async () => {
-  const blog = new Blog({ title: 'forid', url: 'whocares' });
+  const user = await getUserFromDb(data.users[0].username);
+  const blog = new Blog({
+    title: 'forid',
+    url: 'whocares',
+    user: user._id.toString(),
+  });
+
   await blog.save();
   await Blog.findByIdAndDelete(blog._id.toString());
   return blog._id.toString();
