@@ -51,7 +51,7 @@ blogsRouter.delete(
         response.status(204).end();
       }
       if (blog.user.toString() !== request.user.id) {
-        response.status(401).json({
+        return response.status(401).json({
           error: 'unauthorized blog operation',
         });
       }
@@ -81,7 +81,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
       }
     );
     if (!updatedBlog) {
-      response.status(404).json({
+      return response.status(404).json({
         error: `blog with id:${request.params.id} could not be found`,
       });
     }
