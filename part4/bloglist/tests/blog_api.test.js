@@ -42,7 +42,7 @@ describe('BLOGS', () => {
         .expect(expectedStatus)
         .expect('Content-Type', /application\/json/);
 
-      if (expectedStatus === 400) return {};
+      if (expectedStatus !== 201) return {};
 
       const blog = await helper.getBlogFromDb(response.body.id);
       expect(blog).toBeDefined();
@@ -91,7 +91,7 @@ describe('BLOGS', () => {
       });
     });
 
-    describe('fails to create blog', () => {
+    describe('fails to create a blog', () => {
       test('when a request is missing required [title] property', async () => {
         const authData = await helper.getUserAuthData(
           helper.data.users[0].username
@@ -123,6 +123,24 @@ describe('BLOGS', () => {
         };
 
         await checkBlogCreation(blogRequest, 400, authData);
+
+        const blogs = await helper.blogsInDb();
+        expect(blogs).toHaveLength(helper.data.blogs.length);
+      });
+
+      test('when a request is missing auth data', async () => {
+        const authData = await helper.getUserAuthData(
+          helper.data.users[0].username
+        );
+
+        const blogRequest = {
+          title: 'Missing auth',
+          author: 'Test Dummy',
+          likes: 5,
+          user: authData.user._id.toString(),
+        };
+
+        await checkBlogCreation(blogRequest, 401, null);
 
         const blogs = await helper.blogsInDb();
         expect(blogs).toHaveLength(helper.data.blogs.length);
