@@ -81,7 +81,9 @@ blogsRouter.put('/:id', async (request, response, next) => {
       }
     );
     if (!updatedBlog) {
-      response.status(404).end();
+      response.status(404).json({
+        error: `blog with id:${request.params.id} could not be found`,
+      });
     }
     response.json(updatedBlog);
   } catch (error) {

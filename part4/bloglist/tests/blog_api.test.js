@@ -183,6 +183,7 @@ describe('BLOGS', () => {
         const authData = await helper.getUserAuthData(
           helper.data.users[1].username
         );
+
         const blogs = await helper.blogsInDb();
         const id = await blogs.find(
           (blog) => blog.user.toString() !== authData.user._id.toString()
@@ -203,62 +204,73 @@ describe('BLOGS', () => {
   });
 
   describe('PUT /api/blogs/:id', () => {
-    test('successfully updates existing blog and ignores additional properties', async () => {
-      let id = await helper.getExistingId();
+    const checkBlogUpdate = async (id, updateRequest, code) => {
       const blogBefore = await helper.getBlogFromDb(id);
-
-      let blogUpdates = {
-        title: 'update',
-        additional: 'should-not-contain-this',
-      };
 
       await api
         .put(`/api/blogs/${id}`)
-        .send(blogUpdates)
-        .expect(200)
+        .send(updateRequest)
+        .expect(code)
         .expect('Content-Type', /application\/json/);
 
       const blogAfter = await helper.getBlogFromDb(id);
 
-      expect(blogAfter.title).toBe(blogUpdates.title);
+      if (code !== 200) {
+        expect(blogBefore).toStrictEqual(blogAfter);
+        return;
+      }
 
-      expect(blogAfter.author).toBe(blogBefore.author);
-      expect(blogAfter.url).toBe(blogBefore.url);
-      expect(blogAfter.likes).toBe(blogBefore.likes);
+      const beforeProps = Object.keys(blogBefore._doc);
+      const afterProps = Object.keys(blogAfter._doc);
+      const excessProps = Object.keys(updateRequest).filter(
+        (prop) => !beforeProps.includes(prop)
+      );
 
-      expect(blogAfter.additional).toBeUndefined();
+      expect(beforeProps).toHaveLength(afterProps.length);
+      for (let prop of beforeProps) {
+        if (updateRequest[prop] && code === 200) {
+          expect(blogAfter[prop]).toEqual(updateRequest[prop]);
+        } else {
+          expect(blogAfter[prop]).toEqual(blogBefore[prop]);
+        }
+      }
+
+      excessProps.forEach((prop) => expect(blogAfter[prop]).toBeUndefined());
+    };
+
+    describe('successfully updates blog', () => {
+      test('when given a valid request', async () => {
+        const blogs = await helper.blogsInDb();
+        const validId = blogs[0].id;
+
+        const updateRequest = {
+          title: 'update',
+          additional: 'should-not-contain-this',
+        };
+
+        await checkBlogUpdate(validId, updateRequest, 200);
+      });
     });
 
-    test('fails to update on validation fail', async () => {
-      let id = await helper.getExistingId();
-      const blogBefore = await helper.getBlogFromDb(id);
+    describe('fails to update blog', () => {
+      test('when data validation fails', async () => {
+        const blogs = await helper.blogsInDb();
+        const validId = blogs[1].id;
 
-      let blogUpdates = {
-        title: '',
-      };
+        let updateRequest = {
+          title: '',
+        };
 
-      await api.put(`/api/blogs/${id}`).send(blogUpdates).expect(400);
+        await checkBlogUpdate(validId, updateRequest, 400);
+      });
 
-      const blogAfter = await helper.getBlogFromDb(id);
+      test('when given non-existent id', async () => {
+        const nonExistentId = await helper.getNonExistentId();
+        const updateRequest = {
+          title: 'update',
+        };
 
-      expect(blogAfter).toStrictEqual(blogBefore);
-    });
-
-    test('fails to update non-existent blog', async () => {
-      const blogsBefore = await helper.blogsInDb();
-
-      let id = await helper.getNonExistentId();
-      let blogUpdates = {
-        title: 'update',
-        additional: 'should-not-contain-this',
-      };
-
-      await api.put(`/api/blogs/${id}`).send(blogUpdates).expect(404);
-
-      const blogsAfter = await helper.blogsInDb();
-
-      blogsAfter.forEach((blog, idx) => {
-        expect(blog).toStrictEqual(blogsBefore[idx]);
+        await checkBlogUpdate(nonExistentId, updateRequest, 404);
       });
     });
   });
