@@ -92,7 +92,7 @@ describe('BLOGS', () => {
     });
 
     describe('fails to create blog', () => {
-      test('when a request is missing a [title] property', async () => {
+      test('when a request is missing required [title] property', async () => {
         const authData = await helper.getUserAuthData(
           helper.data.users[0].username
         );
@@ -110,7 +110,7 @@ describe('BLOGS', () => {
         expect(blogs).toHaveLength(helper.data.blogs.length);
       });
 
-      test('when a request is missing a [url] property', async () => {
+      test('when a request is missing required [url] property', async () => {
         const authData = await helper.getUserAuthData(
           helper.data.users[0].username
         );
