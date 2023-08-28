@@ -1,28 +1,24 @@
-import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
+import { useState, useEffect } from 'react';
+import Blog from './components/Blog';
+import blogService from './services/blogs';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
-  }, [])
+    blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, []);
 
-  const handleLogin = () => {
-    
-  }
+  const handleLogin = () => {};
 
-  const loginForm = () => (    
-  <form onSubmit={handleLogin}>
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -31,7 +27,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -39,15 +35,15 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-    </form>  
-    );
+    </form>
+  );
 
   const blogList = () => (
     <div>
       <h2>blogs</h2>
-      {blogs.map(blog =>
+      {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
-      )}
+      ))}
     </div>
   );
 
@@ -56,7 +52,7 @@ const App = () => {
       {user == null && loginForm()}
       {user != null && blogList()}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
