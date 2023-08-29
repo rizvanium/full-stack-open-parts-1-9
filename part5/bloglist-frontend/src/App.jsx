@@ -11,6 +11,8 @@ const App = () => {
   const [newTitle, setNewTitle] = useState('');
   const [newAuthor, setNewAuthor] = useState('');
   const [newUrl, setNewUrl] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -24,6 +26,8 @@ const App = () => {
     const user = JSON.parse(currentUserJson);
     blogService.setToken(user.token);
     setUser(user);
+    setInfoMessage(`Welcome back, ${user.name}`);
+    setTimeout(() => setInfoMessage(''), 4000);
   }, []);
 
   const handleLogin = async (event) => {
@@ -35,8 +39,11 @@ const App = () => {
       setUser(user);
       setUsername('');
       setPassword('');
+      setInfoMessage(`Hello, ${user.name}!`);
+      setTimeout(() => setInfoMessage(''), 4000);
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error.response.data.error);
+      setTimeout(() => setErrorMessage(''), 4000);
     }
   };
 
@@ -44,6 +51,8 @@ const App = () => {
     localStorage.clear();
     blogService.setToken(null);
     setUser(null);
+    setInfoMessage('Bye, see you soon');
+    setTimeout(() => setInfoMessage(''), 4000);
   };
 
   const handleCreateBlog = async (event) => {
@@ -58,12 +67,23 @@ const App = () => {
       setNewAuthor('');
       setNewUrl('');
       setBlogs([...blogs, newBlog]);
-    } catch (error) {}
+      setInfoMessage(
+        `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`
+      );
+      setTimeout(() => setInfoMessage(''), 4000);
+    } catch (error) {
+      setErrorMessage(
+        `failed to add new blog, reason: ${error.response.data.error}`
+      );
+      setTimeout(() => setErrorMessage(''), 4000);
+    }
   };
 
   const loginForm = () => (
     <div>
       <h2>log in to application</h2>
+      {errorMessage && notification(errorMessage, true)}
+      {infoMessage && notification(infoMessage, false)}
       <form onSubmit={handleLogin}>
         <div>
           username&nbsp;
@@ -123,9 +143,16 @@ const App = () => {
       </form>
     </div>
   );
+
+  const notification = (message, isError = false) => (
+    <p className={`notification ${isError ? 'error' : 'info'}`}>{message}</p>
+  );
+
   const blogList = () => (
     <div>
       <h2>blogs</h2>
+      {errorMessage && notification(errorMessage, true)}
+      {infoMessage && notification(infoMessage, false)}
       <p>
         {user.name} logged in&nbsp;
         <button onClick={handleLogout}>logout</button>
