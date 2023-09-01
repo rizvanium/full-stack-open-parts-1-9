@@ -90,7 +90,14 @@ blogsRouter.put('/:id', async (request, response, next) => {
         error: `blog with id:${request.params.id} could not be found`,
       });
     }
-    response.json(updatedBlog);
+
+    const populatedBlog = await updatedBlog.populate('user', {
+      username: 1,
+      name: 1,
+      id: 1,
+    });
+
+    response.json(populatedBlog);
   } catch (error) {
     next(error);
   }
