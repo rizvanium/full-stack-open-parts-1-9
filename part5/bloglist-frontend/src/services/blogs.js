@@ -16,8 +16,17 @@ const create = async (requestBody) => {
   return response.data;
 };
 
+const update = async (id, requestBody) => {
+  const config = {
+    headers: { Authorization: jwt },
+  };
+
+  const response = await axios.put(`${baseUrl}/${id}`, requestBody, config);
+  return response.data;
+};
+
 const setToken = (token) => {
   jwt = `Bearer ${token}`;
 };
 
-export default { getAll, create, setToken };
+export default { getAll, create, setToken, update };
