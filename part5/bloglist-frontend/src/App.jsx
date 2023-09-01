@@ -8,9 +8,7 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  const [newTitle, setNewTitle] = useState('');
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newUrl, setNewUrl] = useState('');
+
   const [errorMessage, setErrorMessage] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
 
@@ -55,17 +53,9 @@ const App = () => {
     setTimeout(() => setInfoMessage(''), 4000);
   };
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault();
+  const addNewBlog = async (newBlogInfo) => {
     try {
-      const newBlog = await blogService.create({
-        title: newTitle,
-        author: newAuthor,
-        url: newUrl,
-      });
-      setNewTitle('');
-      setNewAuthor('');
-      setNewUrl('');
+      const newBlog = await blogService.create(newBlogInfo);
       setBlogs([...blogs, newBlog]);
       setInfoMessage(
         `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`
@@ -108,42 +98,6 @@ const App = () => {
     </div>
   );
 
-  const newBlogForm = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleCreateBlog}>
-        <div>
-          title:&nbsp;
-          <input
-            type="text"
-            value={newTitle}
-            name="Title"
-            onChange={({ target }) => setNewTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:&nbsp;
-          <input
-            type="text"
-            value={newAuthor}
-            name="Author"
-            onChange={({ target }) => setNewAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:&nbsp;
-          <input
-            type="text"
-            value={newUrl}
-            name="Url"
-            onChange={({ target }) => setNewUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  );
-
   const notification = (message, isError = false) => (
     <p className={`notification ${isError ? 'error' : 'info'}`}>{message}</p>
   );
@@ -167,7 +121,61 @@ const App = () => {
     <div>
       {user == null && loginForm()}
       {user != null && blogList()}
-      {user != null && newBlogForm()}
+      {user != null && <BlogForm createBlog={addNewBlog} />}
+    </div>
+  );
+};
+
+const BlogForm = (props, ref) => {
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
+
+  const handleAddBlog = async (event) => {
+    event.preventDefault();
+    await props.createBlog({
+      title,
+      author,
+      url,
+    });
+    setTitle('');
+    setAuthor('');
+    setUrl('');
+  };
+
+  return (
+    <div>
+      <h2>create new</h2>
+      <form onSubmit={handleAddBlog}>
+        <div>
+          title:&nbsp;
+          <input
+            type="text"
+            value={title}
+            name="Title"
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </div>
+        <div>
+          author:&nbsp;
+          <input
+            type="text"
+            value={author}
+            name="Author"
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </div>
+        <div>
+          url:&nbsp;
+          <input
+            type="text"
+            value={url}
+            name="Url"
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </div>
+        <button type="submit">create</button>
+      </form>
     </div>
   );
 };
