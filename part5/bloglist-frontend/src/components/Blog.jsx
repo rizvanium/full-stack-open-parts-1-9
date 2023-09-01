@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import blogService from '../services/blogs';
 
-const Blog = ({ blog, handleBlogUpdate }) => {
+const Blog = ({ blog, handleUpdate, handleRemoval }) => {
   const [showDetails, setShowDetails] = useState(false);
   const buttonText = showDetails ? 'hide' : 'view';
   const displayDetails = { display: showDetails ? '' : 'none' };
@@ -16,7 +15,7 @@ const Blog = ({ blog, handleBlogUpdate }) => {
 
   const addOneLike = async () => {
     try {
-      await handleBlogUpdate(blog.id, {
+      await handleUpdate(blog.id, {
         user: blog.user.id,
         likes: blog.likes + 1,
         author: blog.author,
@@ -25,6 +24,12 @@ const Blog = ({ blog, handleBlogUpdate }) => {
       });
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const removeBlog = () => {
+    if (confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      handleRemoval(blog.id);
     }
   };
 
@@ -38,6 +43,7 @@ const Blog = ({ blog, handleBlogUpdate }) => {
           likes {blog.likes} <button onClick={addOneLike}>like</button>
         </p>
         <p>{blog.user.name}</p>
+        <button onClick={removeBlog}>remove</button>
       </div>
     </div>
   );

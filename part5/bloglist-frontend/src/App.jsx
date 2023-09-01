@@ -27,7 +27,7 @@ const App = () => {
     blogService.setToken(user.token);
     setUser(user);
     setInfoMessage(`Welcome back, ${user.name}`);
-    setTimeout(() => setInfoMessage(''), 4000);
+    setTimeout(() => setInfoMessage(''), 3000);
   }, []);
 
   const handleLogin = async (event) => {
@@ -40,10 +40,10 @@ const App = () => {
       setUsername('');
       setPassword('');
       setInfoMessage(`Hello, ${user.name}!`);
-      setTimeout(() => setInfoMessage(''), 4000);
+      setTimeout(() => setInfoMessage(''), 3000);
     } catch (error) {
       setErrorMessage(error.response.data.error);
-      setTimeout(() => setErrorMessage(''), 4000);
+      setTimeout(() => setErrorMessage(''), 3000);
     }
   };
 
@@ -52,7 +52,7 @@ const App = () => {
     blogService.setToken(null);
     setUser(null);
     setInfoMessage('Bye, see you soon');
-    setTimeout(() => setInfoMessage(''), 4000);
+    setTimeout(() => setInfoMessage(''), 3000);
   };
 
   const addNewBlog = async (newBlogInfo) => {
@@ -63,12 +63,12 @@ const App = () => {
       setInfoMessage(
         `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`
       );
-      setTimeout(() => setInfoMessage(''), 4000);
+      setTimeout(() => setInfoMessage(''), 3000);
     } catch (error) {
       setErrorMessage(
         `failed to add new blog, reason: ${error.response.data.error}`
       );
-      setTimeout(() => setErrorMessage(''), 4000);
+      setTimeout(() => setErrorMessage(''), 3000);
     }
   };
 
@@ -78,7 +78,24 @@ const App = () => {
       setBlogs(
         blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
       );
-    } catch (error) {}
+    } catch (error) {
+      setErrorMessage(
+        `failed to update blog, reason: ${error.response.data.error}`
+      );
+      setTimeout(() => setErrorMessage(''), 3000);
+    }
+  };
+
+  const removeBlog = async (id) => {
+    try {
+      await blogService.remove(id);
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+    } catch (error) {
+      setErrorMessage(
+        `failed to delete blog, reason: ${error.response.data.error}`
+      );
+      setTimeout(() => setErrorMessage(''), 3000);
+    }
   };
 
   const loginForm = () => (
@@ -126,7 +143,12 @@ const App = () => {
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} handleBlogUpdate={updateBlog} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            handleUpdate={updateBlog}
+            handleRemoval={removeBlog}
+          />
         ))}
     </div>
   );
