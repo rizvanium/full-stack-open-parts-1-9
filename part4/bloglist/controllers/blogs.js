@@ -24,7 +24,7 @@ blogsRouter.post(
 
       const blog = new Blog({
         ...body,
-        author: request.user.name ?? 'unknown',
+        author: body.author ?? 'unknown',
         likes: body.likes ?? 0,
         user: request.user.id,
       });
