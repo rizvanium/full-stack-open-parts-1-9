@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () => {
+  const blogFormRef = useRef();
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -56,6 +63,7 @@ const App = () => {
   const addNewBlog = async (newBlogInfo) => {
     try {
       const newBlog = await blogService.create(newBlogInfo);
+      blogFormRef.current.toggleVisibility();
       setBlogs([...blogs, newBlog]);
       setInfoMessage(
         `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`
@@ -118,7 +126,7 @@ const App = () => {
   );
 
   const blogForm = () => (
-    <Togglable buttonLabel="new blog">
+    <Togglable buttonLabel="new blog" ref={blogFormRef}>
       <BlogForm createBlog={addNewBlog} />
     </Togglable>
   );
@@ -132,26 +140,32 @@ const App = () => {
   );
 };
 
-const Togglable = (props, refs) => {
+const Togglable = forwardRef((props, refs) => {
   const [isVisible, setVisible] = useState(false);
 
   const hiddenWhenVisible = { display: isVisible ? 'none' : '' };
   const VisibleWhenVisible = { display: isVisible ? '' : 'none' };
 
+  const toggleVisibility = () => {
+    setVisible(!isVisible);
+  };
+
+  useImperativeHandle(refs, () => {
+    return { toggleVisibility };
+  });
+
   return (
     <div>
       <div style={hiddenWhenVisible}>
-        <button onClick={() => setVisible(!isVisible)}>
-          {props.buttonLabel}
-        </button>
+        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
       </div>
       <div style={VisibleWhenVisible}>
         {props.children}
-        <button onClick={() => setVisible(!isVisible)}>cancel</button>
+        <button onClick={toggleVisibility}>cancel</button>
       </div>
     </div>
   );
-};
+});
 
 const BlogForm = (props, ref) => {
   const [title, setTitle] = useState('');
