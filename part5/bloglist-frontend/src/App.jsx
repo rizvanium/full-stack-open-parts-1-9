@@ -1,11 +1,6 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
+import Togglable from './components/Togglable';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -139,33 +134,6 @@ const App = () => {
     </div>
   );
 };
-
-const Togglable = forwardRef((props, refs) => {
-  const [isVisible, setVisible] = useState(false);
-
-  const hiddenWhenVisible = { display: isVisible ? 'none' : '' };
-  const VisibleWhenVisible = { display: isVisible ? '' : 'none' };
-
-  const toggleVisibility = () => {
-    setVisible(!isVisible);
-  };
-
-  useImperativeHandle(refs, () => {
-    return { toggleVisibility };
-  });
-
-  return (
-    <div>
-      <div style={hiddenWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
-      </div>
-      <div style={VisibleWhenVisible}>
-        {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
-      </div>
-    </div>
-  );
-});
 
 const BlogForm = (props, ref) => {
   const [title, setTitle] = useState('');
