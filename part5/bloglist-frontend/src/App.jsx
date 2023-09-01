@@ -117,11 +117,38 @@ const App = () => {
     </div>
   );
 
+  const blogForm = () => (
+    <Togglable buttonLabel="create">
+      <BlogForm createBlog={addNewBlog} />
+    </Togglable>
+  );
+
   return (
     <div>
       {user == null && loginForm()}
       {user != null && blogList()}
-      {user != null && <BlogForm createBlog={addNewBlog} />}
+      {user != null && blogForm()}
+    </div>
+  );
+};
+
+const Togglable = (props, refs) => {
+  const [isVisible, setVisible] = useState(false);
+
+  const hiddenWhenVisible = { display: isVisible ? 'none' : '' };
+  const VisibleWhenVisible = { display: isVisible ? '' : 'none' };
+
+  return (
+    <div>
+      <div style={hiddenWhenVisible}>
+        <button onClick={() => setVisible(!isVisible)}>
+          {props.buttonLabel}
+        </button>
+      </div>
+      <div style={VisibleWhenVisible}>
+        {props.children}
+        <button onClick={() => setVisible(!isVisible)}>cancel</button>
+      </div>
     </div>
   );
 };
