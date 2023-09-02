@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import Blog from './components/Blog';
 import Togglable from './components/Togglable';
-import Notification from './components/Notification';
 import BlogForm from './components/BlogForm';
 import LoginForm from './components/LoginForm';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import BlogList from './components/BlogList';
 
 const App = () => {
   const blogFormRef = useRef();
@@ -46,7 +45,7 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
+  const onLogout = () => {
     localStorage.clear();
     blogService.setToken(null);
     setUser(null);
@@ -98,25 +97,15 @@ const App = () => {
   };
 
   const blogList = () => (
-    <div>
-      <h2>blogs</h2>
-      {errorMessage && <Notification message={errorMessage} isError={true} />}
-      {infoMessage && <Notification message={infoMessage} isError={false} />}
-      <p>
-        {user.name} logged in&nbsp;
-        <button onClick={handleLogout}>logout</button>
-      </p>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleUpdate={updateBlog}
-            handleRemoval={removeBlog}
-          />
-        ))}
-    </div>
+    <BlogList
+      blogs={blogs}
+      errorMessage={errorMessage}
+      infoMessage={infoMessage}
+      username={user.name}
+      handleUpdate={updateBlog}
+      handleRemoval={removeBlog}
+      handleLogout={onLogout}
+    />
   );
 
   const blogForm = () => (
