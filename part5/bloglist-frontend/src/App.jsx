@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import Togglable from './components/Togglable';
+import Notification from './components/Notification';
 import BlogForm from './components/BlogForm';
+import LoginForm from './components/LoginForm';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () => {
   const blogFormRef = useRef();
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-
   const [errorMessage, setErrorMessage] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
 
@@ -31,15 +30,12 @@ const App = () => {
     setTimeout(() => setInfoMessage(''), 3000);
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const onLogin = async (username, password) => {
     try {
       const user = await loginService.login(username, password);
       localStorage.setItem('currentUser', JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
-      setUsername('');
-      setPassword('');
       setInfoMessage(`Hello, ${user.name}!`);
       setTimeout(() => setInfoMessage(''), 3000);
     } catch (error) {
@@ -52,7 +48,7 @@ const App = () => {
     localStorage.clear();
     blogService.setToken(null);
     setUser(null);
-    setInfoMessage('Bye, see you soon');
+    setInfoMessage('See Ya Soon');
     setTimeout(() => setInfoMessage(''), 3000);
   };
 
@@ -99,44 +95,11 @@ const App = () => {
     }
   };
 
-  const loginForm = () => (
-    <div>
-      <h2>log in to application</h2>
-      {errorMessage && notification(errorMessage, true)}
-      {infoMessage && notification(infoMessage, false)}
-      <form onSubmit={handleLogin}>
-        <div>
-          username&nbsp;
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password&nbsp;
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  );
-
-  const notification = (message, isError = false) => (
-    <p className={`notification ${isError ? 'error' : 'info'}`}>{message}</p>
-  );
-
   const blogList = () => (
     <div>
       <h2>blogs</h2>
-      {errorMessage && notification(errorMessage, true)}
-      {infoMessage && notification(infoMessage, false)}
+      {errorMessage && <Notification message={errorMessage} isError={true} />}
+      {infoMessage && <Notification message={infoMessage} isError={false} />}
       <p>
         {user.name} logged in&nbsp;
         <button onClick={handleLogout}>logout</button>
@@ -158,6 +121,14 @@ const App = () => {
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
       <BlogForm createBlog={addNewBlog} />
     </Togglable>
+  );
+
+  const loginForm = () => (
+    <LoginForm
+      handleLogin={onLogin}
+      errorMessage={errorMessage}
+      infoMessage={infoMessage}
+    />
   );
 
   return (
