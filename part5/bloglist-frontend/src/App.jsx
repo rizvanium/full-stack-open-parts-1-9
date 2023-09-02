@@ -9,6 +9,7 @@ import loginService from './services/login';
 
 const App = () => {
   const blogFormRef = useRef();
+  const loginFormRef = useRef();
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -36,6 +37,7 @@ const App = () => {
       localStorage.setItem('currentUser', JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
+      loginFormRef.current.toggleVisibility();
       setInfoMessage(`Hello, ${user.name}!`);
       setTimeout(() => setInfoMessage(''), 3000);
     } catch (error) {
@@ -124,11 +126,13 @@ const App = () => {
   );
 
   const loginForm = () => (
-    <LoginForm
-      handleLogin={onLogin}
-      errorMessage={errorMessage}
-      infoMessage={infoMessage}
-    />
+    <Togglable buttonLabel="login" ref={loginFormRef}>
+      <LoginForm
+        handleLogin={onLogin}
+        errorMessage={errorMessage}
+        infoMessage={infoMessage}
+      />
+    </Togglable>
   );
 
   return (
