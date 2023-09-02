@@ -38,7 +38,7 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
     <div style={blogStyle}>
       {blog.title} {blog.author}{' '}
       <button onClick={() => setShowDetails(!showDetails)}>{buttonText}</button>
-      <div style={displayDetails}>
+      <div className='blog-details' style={displayDetails}>
         <p>{blog.url}</p>
         <p>
           likes {blog.likes} <button onClick={addOneLike}>like</button>
