@@ -56,6 +56,14 @@ describe('Blog app', function () {
 
     it.only('A blog can be created', function () {
       cy.contains('new blog').click();
+      cy.get('#new-title').type('Test Blog');
+      cy.get('#new-author').type('Some Guy');
+      cy.get('#new-url').type('test.url.com');
+      cy.get('#new-blog-button').click();
+      cy.contains('Test Blog Some Guy');
+      cy.get('.notification')
+        .should('contain', 'A new blog, Test Blog by: Some Guy has been added.')
+        .and('have.css', 'color', 'rgb(0, 128, 0)');
     });
   });
 });
