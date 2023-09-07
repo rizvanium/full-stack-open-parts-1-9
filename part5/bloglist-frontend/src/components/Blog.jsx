@@ -6,6 +6,7 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
   const buttonText = showDetails ? 'hide' : 'view';
   const displayDetails = { display: showDetails ? '' : 'none' };
 
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -44,7 +45,9 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
           likes {blog.likes} <button onClick={addOneLike}>like</button>
         </p>
         <p>{blog.user.name}</p>
-        <button onClick={removeBlog}>remove</button>
+        {currentUser.username === blog.user.username && (
+          <button className="remove-button" onClick={removeBlog}>remove</button>
+        )}
       </div>
     </div>
   );

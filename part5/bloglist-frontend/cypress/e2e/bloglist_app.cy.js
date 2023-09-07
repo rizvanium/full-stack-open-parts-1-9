@@ -1,12 +1,18 @@
 describe('Blog app', function () {
   beforeEach(function () {
     cy.request('POST', `${Cypress.env('BACKEND_URL')}/testing/reset`);
-    const user = {
+    const user1 = {
       name: 'Generic Test Dummy',
       username: 'testio',
       password: 'password123456',
     };
-    cy.request('POST', `${Cypress.env('BACKEND_URL')}/users`, user);
+    const user2 = {
+      name: 'Another Test Dummy',
+      username: 'coolio',
+      password: '123456password',
+    };
+    cy.request('POST', `${Cypress.env('BACKEND_URL')}/users`, user1);
+    cy.request('POST', `${Cypress.env('BACKEND_URL')}/users`, user2);
     cy.visit('');
   });
 
@@ -83,15 +89,34 @@ describe('Blog app', function () {
         cy.contains('likes 1');
       });
 
-      it.only('it can be deleted by its creator', function () {
+      it('it can be deleted by its creator', function () {
         cy.get('.blog')
           .should('exist')
           .and('contain', 'Test Blog Testonio')
           .as('theBlog');
         cy.contains('view').click();
-        cy.contains('remove').click();
+        cy.get('.remove-button').click();
         cy.wait(500);
         cy.get('@theBlog').should('not.exist');
+      });
+
+      describe('and other user adds new blog', function () {
+        beforeEach(function () {
+          cy.login({ username: 'coolio', password: '123456password' });
+          cy.createBlog({
+            title: 'Another Blog',
+            author: 'Another Guy',
+            url: 'who.cares.nonono',
+          });
+          cy.login({ username: 'testio', password: 'password123456' });
+        });
+
+        it.only("you can't see remove button", function () {
+          cy.contains('Another Blog Another Guy').as('theBlog');
+          cy.get('@theBlog').contains('view').click();
+          cy.wait(100);
+          cy.get('@theBlog').contains('remove').should('not.exist');
+        });
       });
     });
   });
