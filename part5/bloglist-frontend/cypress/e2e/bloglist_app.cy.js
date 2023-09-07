@@ -75,12 +75,23 @@ describe('Blog app', function () {
         });
       });
 
-      it.only('it can be liked', function () {
+      it('it can be liked', function () {
         cy.contains('view').click();
         cy.contains('likes 0');
         cy.contains('like').click();
         cy.wait(500);
         cy.contains('likes 1');
+      });
+
+      it.only('it can be deleted by its creator', function () {
+        cy.get('.blog')
+          .should('exist')
+          .and('contain', 'Test Blog Testonio')
+          .as('theBlog');
+        cy.contains('view').click();
+        cy.contains('remove').click();
+        cy.wait(500);
+        cy.get('@theBlog').should('not.exist');
       });
     });
   });
