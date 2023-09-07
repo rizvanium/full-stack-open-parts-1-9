@@ -54,7 +54,7 @@ describe('Blog app', function () {
       cy.login({ username: 'testio', password: 'password123456' });
     });
 
-    it.only('A blog can be created', function () {
+    it('A blog can be created', function () {
       cy.contains('new blog').click();
       cy.get('#new-title').type('Test Blog');
       cy.get('#new-author').type('Some Guy');
@@ -64,6 +64,24 @@ describe('Blog app', function () {
       cy.get('.notification')
         .should('contain', 'A new blog, Test Blog by: Some Guy has been added.')
         .and('have.css', 'color', 'rgb(0, 128, 0)');
+    });
+
+    describe('and a blog exists', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'Test Blog',
+          author: 'Testonio',
+          url: 'some.url.nonono',
+        });
+      });
+
+      it.only('it can be liked', function () {
+        cy.contains('view').click();
+        cy.contains('likes 0');
+        cy.contains('like').click();
+        cy.wait(500);
+        cy.contains('likes 1');
+      });
     });
   });
 });
