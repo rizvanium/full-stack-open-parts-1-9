@@ -99,24 +99,57 @@ describe('Blog app', function () {
         cy.wait(500);
         cy.get('@theBlog').should('not.exist');
       });
+    });
+  });
 
-      describe('and other user adds new blog', function () {
-        beforeEach(function () {
-          cy.login({ username: 'coolio', password: '123456password' });
-          cy.createBlog({
-            title: 'Another Blog',
-            author: 'Another Guy',
-            url: 'who.cares.nonono',
-          });
-          cy.login({ username: 'testio', password: 'password123456' });
+  describe('When multiple users exist', function () {
+    describe('And each user adds a blog', function () {
+      beforeEach(function () {
+        cy.login({ username: 'coolio', password: '123456password' });
+        cy.createBlog({
+          title: 'Another Blog',
+          author: 'Another Guy',
+          url: 'who.cares.nonono',
         });
+        cy.login({ username: 'testio', password: 'password123456' });
+        cy.createBlog({
+          title: 'Test Blog',
+          author: 'Testonio',
+          url: 'some.url.nonono',
+        });
+      });
 
-        it.only("you can't see remove button", function () {
-          cy.contains('Another Blog Another Guy').as('theBlog');
-          cy.get('@theBlog').contains('view').click();
-          cy.wait(100);
-          cy.get('@theBlog').contains('remove').should('not.exist');
-        });
+      it("current user can only see remove button of it's own blog and not the other users blog", function () {
+        cy.contains('Test Blog Testonio').as('currentUserBlog');
+        cy.contains('Another Blog Another Guy').as('otherUserBlog');
+
+        cy.get('@currentUserBlog').contains('view').click();
+        cy.get('@otherUserBlog').contains('view').click();
+
+        cy.wait(100);
+        cy.get('@currentUserBlog').contains('remove').should('exist');
+        cy.get('@otherUserBlog').contains('remove').should('not.exist');
+      });
+
+      it('blog with the most likes is moved to the top of the page', function () {
+        cy.contains('Test Blog Testonio').as('currentUserBlog');
+        cy.contains('Another Blog Another Guy').as('otherUserBlog');
+
+        cy.get('@currentUserBlog').contains('view').click();
+        cy.get('@otherUserBlog').contains('view').click();
+
+        cy.wait(100);
+
+        cy.get('@currentUserBlog').contains('like').click();
+        cy.wait(200);
+        cy.get('.blog').eq(0).should('contain', 'Test Blog');
+        cy.get('.blog').eq(1).should('contain', 'Another Blog');
+
+        cy.get('@otherUserBlog').contains('like').click();
+        cy.get('@otherUserBlog').contains('like').click();
+        cy.wait(200);
+        cy.get('.blog').eq(0).should('contain', 'Another Blog');
+        cy.get('.blog').eq(1).should('contain', 'Test Blog');
       });
     });
   });
