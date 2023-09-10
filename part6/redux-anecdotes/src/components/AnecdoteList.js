@@ -8,9 +8,9 @@ const AnecdoteList = () => {
   const anecdotes = useSelector(({ anecdotes, filter }) => anecdotes.filter(a => a.content.includes(filter)));
   const dispatch = useDispatch()
 
-  const vote = ({ id, content }) => {
-    dispatch(increaseVoteCount(id));
-    dispatch(setMessage(`You've voted for '${content}'`))
+  const vote = (anecdote) => {
+    dispatch(increaseVoteCount(anecdote));
+    dispatch(setMessage(`You've voted for '${anecdote.content}'`))
     setTimeout(() => dispatch(removeMessage()), 5000);
   }
 
