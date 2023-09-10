@@ -22,8 +22,6 @@ const getSortedByVotes = (anecdotes) => anecdotes.sort((a, b) => b.votes - a.vot
 const initialState = anecdotesAtStart.map(asObject)
 
 const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
   let updatedState;
   switch (action.type) {
     case 'INCREASE_VOTE':

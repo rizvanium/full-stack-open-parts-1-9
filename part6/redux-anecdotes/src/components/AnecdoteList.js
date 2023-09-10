@@ -3,7 +3,7 @@ import { increaseVoteCount } from '../reducers/anecdoteReducer';
 import Anecdote from './Anecdote';
 
 const AnecdoteList = () => {
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(({ anecdotes, filter }) => anecdotes.filter(a => a.content.includes(filter)));
   const dispatch = useDispatch()
 
   const vote = (id) => {
