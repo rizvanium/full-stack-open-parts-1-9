@@ -5,7 +5,7 @@ import notificationReducer from './reducers/notificationReducer';
 
 export default configureStore({
   reducer: {
-    anecdotes:  anecdoteReducer,
+    anecdotes: anecdoteReducer,
     filter: filterReducer,
     message: notificationReducer,
   }
