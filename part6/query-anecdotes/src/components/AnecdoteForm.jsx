@@ -4,8 +4,9 @@ import { createAnecdote } from '../requests';
 const AnecdoteForm = () => {
   const queryClient = useQueryClient();
   const newAnecdoteMutation = useMutation(createAnecdote, {
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+    onSuccess: (newAnecdote) => {
+      const anecdotes = queryClient.getQueryData({ queryKey: ['anecdotes'] })
+      queryClient.setQueryData({ queryKey: ['anecdotes'] }, anecdotes.concat(newAnecdote))
     }
   })
   const onCreate = (event) => {
