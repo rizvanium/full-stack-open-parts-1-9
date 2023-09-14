@@ -1,0 +1,20 @@
+###
+GET http://localhost:3003/api/blogs
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWNmNTgwMDc3YTk2ZWE4Y2Y1YzFiYiIsInVzZXJuYW1lIjoidGVzdGl1bSIsImlhdCI6MTY5MzU4MDg2MSwiZXhwIjoxNjkzNTg0NDYxfQ.beMHMWX8DpRhQcj3wW9pR7TipOlQYvNAwsVARNkjTX8
+
+{
+  "title": "Test Blog 5",
+  "url": "test-url",
+  "likes": 0
+}
+
+###
+GET http://localhost:3003/api/blogs/64eb5e0a7373a86b25311a00
+
+###
+DELETE http://localhost:3003/api/blogs/64e51a58eb9c294e62f54b02
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTNiNjI5NzE4MTE2OWExNjFiMjIzYyIsInVzZXJuYW1lIjoiYW5vdGhlciIsImlhdCI6MTY5MjczNjAwOSwiZXhwIjoxNjkyNzM5NjA5fQ._Bbq9LFkf-r0mD3krv7DZKEfSzvybbZYbOAZ2VDqWvA

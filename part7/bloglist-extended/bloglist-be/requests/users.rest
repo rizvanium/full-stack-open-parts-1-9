@@ -1,0 +1,21 @@
+GET http://localhost:3003/api/users
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "testium",
+  "name": "Test Dummy",
+  "password": "testword123456"
+}
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "another",
+  "name": "Test Dummy",
+  "password": "testword123456"
+}
