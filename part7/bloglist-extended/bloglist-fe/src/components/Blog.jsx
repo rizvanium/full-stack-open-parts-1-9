@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateBlog, removeBlog } from '../reducers/blogReducer';
 
-const Blog = ({ blog, handleUpdate, handleRemoval }) => {
+const Blog = ({ blog }) => {
   const [showDetails, setShowDetails] = useState(false);
   const buttonText = showDetails ? 'hide' : 'view';
   const displayDetails = { display: showDetails ? '' : 'none' };
+  const dispatch = useDispatch();
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
   const blogStyle = {
@@ -16,22 +19,20 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
   };
 
   const addOneLike = async () => {
-    try {
-      await handleUpdate(blog.id, {
+    dispatch(
+      updateBlog(blog.id, {
         user: blog.user.id,
         likes: blog.likes + 1,
         author: blog.author,
         title: blog.title,
         url: blog.url,
-      });
-    } catch (error) {
-      console.error(error);
-    }
+      })
+    );
   };
 
-  const removeBlog = () => {
+  const handleBlogRemoval = async () => {
     if (confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      handleRemoval(blog.id);
+      dispatch(removeBlog(blog.id));
     }
   };
 
@@ -46,7 +47,7 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
         </p>
         <p>{blog.user.name}</p>
         {currentUser.username === blog.user.username && (
-          <button className="remove-button" onClick={removeBlog}>
+          <button className="remove-button" onClick={handleBlogRemoval}>
             remove
           </button>
         )}
@@ -57,8 +58,6 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
-  handleRemoval: PropTypes.func.isRequired,
 };
 
 export default Blog;

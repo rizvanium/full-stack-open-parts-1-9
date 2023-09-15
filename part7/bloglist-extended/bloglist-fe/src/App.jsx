@@ -7,17 +7,17 @@ import loginService from './services/login';
 import BlogList from './components/BlogList';
 import { useDispatch } from 'react-redux';
 import { setNotification } from './reducers/notificationReducer';
+import { initializeBlogs } from './reducers/blogReducer';
 
 const App = () => {
   const blogFormRef = useRef();
   const loginFormRef = useRef();
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
 
   useEffect(() => {
     const currentUserJson = localStorage.getItem('currentUser');
@@ -62,90 +62,19 @@ const App = () => {
     dispatch(setNotification({ content: 'See Ya Soon', isError: false }, 3));
   };
 
-  const addNewBlog = async (newBlogInfo) => {
-    try {
-      const newBlog = await blogService.create(newBlogInfo);
-      blogFormRef.current.toggleVisibility();
-      setBlogs([...blogs, newBlog]);
-      dispatch(
-        setNotification(
-          {
-            content: `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`,
-            isError: false,
-          },
-          3
-        )
-      );
-    } catch (error) {
-      dispatch(
-        setNotification(
-          {
-            content: `failed to add new blog, reason: ${error.response.data.error}`,
-            isError: true,
-          },
-          3
-        )
-      );
-    }
-  };
-
-  const updateBlog = async (id, updateInfo) => {
-    try {
-      const updatedBlog = await blogService.update(id, updateInfo);
-      setBlogs(
-        blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
-      );
-    } catch (error) {
-      dispatch(
-        setNotification(
-          {
-            content: `failed to update blog, reason: ${error.response.data.error}`,
-            isError: true,
-          },
-          3
-        )
-      );
-    }
-  };
-
-  const removeBlog = async (id) => {
-    try {
-      await blogService.remove(id);
-      setBlogs(blogs.filter((blog) => blog.id !== id));
-    } catch (error) {
-      dispatch(
-        setNotification(
-          {
-            content: `failed to delete blog, reason: ${error.response.data.error}`,
-            isError: true,
-          },
-          3
-        )
-      );
-    }
-  };
-
   const blogList = () => (
-    <BlogList
-      blogs={blogs}
-      username={user.name}
-      handleUpdate={updateBlog}
-      handleRemoval={removeBlog}
-      handleLogout={onLogout}
-    />
+    <BlogList username={user.name} handleLogout={onLogout} />
   );
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addNewBlog} />
+      <BlogForm />
     </Togglable>
   );
 
   const loginForm = () => (
     <Togglable buttonLabel="login" ref={loginFormRef}>
-      <LoginForm
-        handleLogin={onLogin}
-      />
+      <LoginForm handleLogin={onLogin} />
     </Togglable>
   );
 
