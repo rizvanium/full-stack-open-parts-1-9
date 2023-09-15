@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Notification from './Notification';
 import PropTypes from 'prop-types';
 
-const LoginForm = ({ handleLogin, errorMessage, infoMessage }) => {
+const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -16,8 +16,7 @@ const LoginForm = ({ handleLogin, errorMessage, infoMessage }) => {
   return (
     <div>
       <h2>log in to application</h2>
-      {errorMessage && <Notification message={errorMessage} isError={true} />}
-      {infoMessage && <Notification message={infoMessage} isError={false} />}
+      <Notification />
       <form onSubmit={login}>
         <div>
           username&nbsp;
@@ -49,8 +48,6 @@ const LoginForm = ({ handleLogin, errorMessage, infoMessage }) => {
 
 LoginForm.propTypes = {
   handleLogin: PropTypes.func.isRequired,
-  errorMessage: PropTypes.string.isRequired,
-  infoMessage: PropTypes.string.isRequired,
 };
 
 export default LoginForm;
