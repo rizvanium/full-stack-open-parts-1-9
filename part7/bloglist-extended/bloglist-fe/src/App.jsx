@@ -18,7 +18,7 @@ const App = () => {
     dispatch(initializeBlogs());
   }, [dispatch]);
 
-  const blogList = () => <BlogList username={user.name} />;
+  const blogList = () => <BlogList />;
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
