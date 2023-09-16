@@ -76,28 +76,8 @@ const App = () => {
     dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
   };
 
-  const removeBlog = async (id) => {
-    try {
-      await blogService.remove(id);
-      // setBlogs(blogs.filter((blog) => blog.id !== id));
-    } catch (error) {
-      dispatchNotification(
-        {
-          content: `failed to delete blog, reason: ${error.response.data.error}`,
-          isError: true,
-        },
-        3
-      );
-    }
-  };
-
   const blogList = () => (
-    <BlogList
-      blogs={blogs}
-      username={user.name}
-      handleRemoval={removeBlog}
-      handleLogout={onLogout}
-    />
+    <BlogList blogs={blogs} username={user.name} handleLogout={onLogout} />
   );
 
   const blogForm = () => (
