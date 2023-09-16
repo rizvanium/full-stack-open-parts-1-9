@@ -9,6 +9,25 @@ const BlogList = ({ blogs, username, handleLogout }) => {
   const queryClient = useQueryClient();
   const dispatchNotification = useNotificationDispatch();
 
+  const blogUpdateMutation = useMutation(blogService.update, {
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      );
+      queryClient.setQueryData({ queryKey: ['blogs'] }, updatedBlogs);
+    },
+    onError: (error) => {
+      dispatchNotification(
+        {
+          content: `failed to update blog, reason: ${error.response.data.error}`,
+          isError: true,
+        },
+        3
+      );
+    },
+  });
+
   const blogRemovalMutation = useMutation(blogService.remove, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
@@ -38,7 +57,8 @@ const BlogList = ({ blogs, username, handleLogout }) => {
           <Blog
             key={blog.id}
             blog={blog}
-            handleRemoval={() => blogRemovalMutation.mutate(blog.id)}
+            handleUpdate={blogUpdateMutation.mutate}
+            handleRemoval={blogRemovalMutation.mutate}
           />
         ))}
     </div>

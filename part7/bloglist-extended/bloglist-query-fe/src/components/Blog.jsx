@@ -1,32 +1,8 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import blogService from '../services/blogs';
-import { useNotificationDispatch } from '../NotificationContext';
 
-const Blog = ({ blog, handleRemoval }) => {
-  const queryClient = useQueryClient();
-  const dispatchNotification = useNotificationDispatch();
+const Blog = ({ blog, handleUpdate, handleRemoval }) => {
   const [showDetails, setShowDetails] = useState(false);
-
-  const blogUpdateMutation = useMutation(blogService.update, {
-    onSuccess: (updatedBlog) => {
-      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
-      const updatedBlogs = blogs.map((blog) =>
-        blog.id === updatedBlog.id ? updatedBlog : blog
-      );
-      queryClient.setQueryData({ queryKey: ['blogs'] }, updatedBlogs);
-    },
-    onError: (error) => {
-      dispatchNotification(
-        {
-          content: `failed to update blog, reason: ${error.response.data.error}`,
-          isError: true,
-        },
-        3
-      );
-    },
-  });
 
   const buttonText = showDetails ? 'hide' : 'view';
   const displayDetails = { display: showDetails ? '' : 'none' };
@@ -42,7 +18,7 @@ const Blog = ({ blog, handleRemoval }) => {
   };
 
   const addOneLike = () => {
-    blogUpdateMutation.mutate({
+    handleUpdate({
       ...blog,
       likes: blog.likes + 1,
     });
@@ -76,6 +52,7 @@ const Blog = ({ blog, handleRemoval }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   handleRemoval: PropTypes.func.isRequired,
 };
 
