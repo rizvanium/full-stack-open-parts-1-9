@@ -6,16 +6,15 @@ import blogService from './services/blogs';
 import loginService from './services/login';
 import BlogList from './components/BlogList';
 import { useNotificationDispatch } from './NotificationContext';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const App = () => {
+  const queryClient = useQueryClient();
+
   const blogFormRef = useRef();
   const loginFormRef = useRef();
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const dispatchNotification = useNotificationDispatch();
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
 
   useEffect(() => {
     const currentUserJson = localStorage.getItem('currentUser');
@@ -30,6 +29,28 @@ const App = () => {
       3
     );
   }, []);
+
+  const blogsQueryResult = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    retry: 2,
+  });
+
+
+
+  if (blogsQueryResult.isLoading) {
+    return <div>Loading data</div>;
+  }
+
+  if (blogsQueryResult.isError) {
+    return (
+      <div>
+        The server providing you with blog information is having some issues
+      </div>
+    );
+  }
+
+  const blogs = blogsQueryResult.data;
 
   const onLogin = async (username, password) => {
     try {
@@ -57,35 +78,14 @@ const App = () => {
     dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
   };
 
-  const addNewBlog = async (newBlogInfo) => {
-    try {
-      const newBlog = await blogService.create(newBlogInfo);
-      blogFormRef.current.toggleVisibility();
-      setBlogs([...blogs, newBlog]);
-      dispatchNotification(
-        {
-          content: `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`,
-          isError: false,
-        },
-        3
-      );
-    } catch (error) {
-      dispatchNotification(
-        {
-          content: `failed to add new blog, reason: ${error.response.data.error}`,
-          isError: true,
-        },
-        3
-      );
-    }
-  };
+
 
   const updateBlog = async (id, updateInfo) => {
     try {
       const updatedBlog = await blogService.update(id, updateInfo);
-      setBlogs(
-        blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
-      );
+      // setBlogs(
+      //   blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
+      // );
     } catch (error) {
       dispatchNotification(
         {
@@ -100,7 +100,7 @@ const App = () => {
   const removeBlog = async (id) => {
     try {
       await blogService.remove(id);
-      setBlogs(blogs.filter((blog) => blog.id !== id));
+      // setBlogs(blogs.filter((blog) => blog.id !== id));
     } catch (error) {
       dispatchNotification(
         {
@@ -124,7 +124,7 @@ const App = () => {
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addNewBlog} />
+      <BlogForm />
     </Togglable>
   );
 
