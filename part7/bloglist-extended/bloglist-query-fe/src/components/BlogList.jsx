@@ -2,13 +2,7 @@ import PropTypes from 'prop-types';
 import Notification from './Notification';
 import Blog from './Blog';
 
-const BlogList = ({
-  blogs,
-  username,
-  handleUpdate,
-  handleRemoval,
-  handleLogout,
-}) => {
+const BlogList = ({ blogs, username, handleRemoval, handleLogout }) => {
   return (
     <div>
       <h2>blogs</h2>
@@ -20,12 +14,7 @@ const BlogList = ({
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleUpdate={handleUpdate}
-            handleRemoval={handleRemoval}
-          />
+          <Blog key={blog.id} blog={blog} handleRemoval={handleRemoval} />
         ))}
     </div>
   );
@@ -33,7 +22,6 @@ const BlogList = ({
 
 BlogList.propTypes = {
   blogs: PropTypes.array.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleRemoval: PropTypes.func.isRequired,
   handleLogout: PropTypes.func.isRequired,
 };

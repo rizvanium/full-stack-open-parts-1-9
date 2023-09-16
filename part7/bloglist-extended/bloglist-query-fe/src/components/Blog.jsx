@@ -1,12 +1,38 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import blogService from '../services/blogs';
+import { useNotificationDispatch } from '../NotificationContext';
 
-const Blog = ({ blog, handleUpdate, handleRemoval }) => {
+const Blog = ({ blog, handleRemoval }) => {
+  const queryClient = useQueryClient();
+  const dispatchNotification = useNotificationDispatch();
   const [showDetails, setShowDetails] = useState(false);
+
+  const blogUpdateMutation = useMutation(blogService.update, {
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      );
+      queryClient.setQueryData({ queryKey: ['blogs'] }, updatedBlogs);
+    },
+    onError: (error) => {
+      dispatchNotification(
+        {
+          content: `failed to update blog, reason: ${error.response.data.error}`,
+          isError: true,
+        },
+        3
+      );
+    },
+  });
+
   const buttonText = showDetails ? 'hide' : 'view';
   const displayDetails = { display: showDetails ? '' : 'none' };
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -15,18 +41,11 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
     marginBottom: 5,
   };
 
-  const addOneLike = async () => {
-    try {
-      await handleUpdate(blog.id, {
-        user: blog.user.id,
-        likes: blog.likes + 1,
-        author: blog.author,
-        title: blog.title,
-        url: blog.url,
-      });
-    } catch (error) {
-      console.error(error);
-    }
+  const addOneLike = () => {
+    blogUpdateMutation.mutate({
+      ...blog,
+      likes: blog.likes + 1,
+    });
   };
 
   const removeBlog = () => {
@@ -46,7 +65,9 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
         </p>
         <p>{blog.user.name}</p>
         {currentUser.username === blog.user.username && (
-          <button className="remove-button" onClick={removeBlog}>remove</button>
+          <button className="remove-button" onClick={removeBlog}>
+            remove
+          </button>
         )}
       </div>
     </div>
@@ -55,7 +76,6 @@ const Blog = ({ blog, handleUpdate, handleRemoval }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleRemoval: PropTypes.func.isRequired,
 };
 

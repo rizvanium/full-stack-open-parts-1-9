@@ -36,8 +36,6 @@ const App = () => {
     retry: 2,
   });
 
-
-
   if (blogsQueryResult.isLoading) {
     return <div>Loading data</div>;
   }
@@ -78,25 +76,6 @@ const App = () => {
     dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
   };
 
-
-
-  const updateBlog = async (id, updateInfo) => {
-    try {
-      const updatedBlog = await blogService.update(id, updateInfo);
-      // setBlogs(
-      //   blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
-      // );
-    } catch (error) {
-      dispatchNotification(
-        {
-          content: `failed to update blog, reason: ${error.response.data.error}`,
-          isError: true,
-        },
-        3
-      );
-    }
-  };
-
   const removeBlog = async (id) => {
     try {
       await blogService.remove(id);
@@ -116,7 +95,6 @@ const App = () => {
     <BlogList
       blogs={blogs}
       username={user.name}
-      handleUpdate={updateBlog}
       handleRemoval={removeBlog}
       handleLogout={onLogout}
     />
