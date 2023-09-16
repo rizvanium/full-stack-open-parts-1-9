@@ -1,14 +1,14 @@
-import PropTypes from 'prop-types';
+import { useNotificationValue } from '../NotificationContext';
 
-const Notification = ({ isError, message }) => {
+const Notification = () => {
+  const notification = useNotificationValue();
+  if (!notification) return null;
+
+  const { content, isError } = notification;
+
   return (
-    <p className={`notification ${isError ? 'error' : 'info'}`}>{message}</p>
+    <p className={`notification ${isError ? 'error' : 'info'}`}>{content}</p>
   );
-};
-
-Notification.propTypes = {
-  isError: PropTypes.bool.isRequired,
-  message: PropTypes.string.isRequired,
 };
 
 export default Notification;
