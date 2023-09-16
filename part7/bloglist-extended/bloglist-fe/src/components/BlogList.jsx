@@ -1,13 +1,13 @@
-import PropTypes from 'prop-types';
 import Notification from './Notification';
 import Blog from './Blog';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../reducers/userReducer';
 
-const BlogList = ({ username }) => {
+const BlogList = () => {
   const dispatch = useDispatch();
 
   const blogs = useSelector((state) => state.blogs);
+  const username = useSelector((state) => state.user.username);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -29,10 +29,6 @@ const BlogList = ({ username }) => {
         ))}
     </div>
   );
-};
-
-BlogList.propTypes = {
-  handleLogout: PropTypes.func.isRequired,
 };
 
 export default BlogList;
