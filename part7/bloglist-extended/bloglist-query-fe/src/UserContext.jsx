@@ -3,8 +3,10 @@ import { createContext, useContext, useEffect, useReducer } from 'react';
 const userReducer = (state, action) => {
   switch (action.type) {
     case 'SET_USER':
+      localStorage.setItem('currentUser', JSON.stringify(action.payload));
       return { ...action.payload };
     case 'REMOVE_USER':
+      localStorage.clear();
       return null;
     default:
       return state;

@@ -6,7 +6,7 @@ import { useNotificationDispatch } from '../NotificationContext';
 import loginService from '../services/login';
 import blogService from '../services/blogs';
 
-const LoginForm = () => {
+const LoginForm = ({ toggleVisibility }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatchUserUpdate = useUserDispatch();
@@ -14,13 +14,12 @@ const LoginForm = () => {
 
   const loginMutation = useMutation(loginService.login, {
     onSuccess: (user) => {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      blogService.setToken(user.token);
       dispatchUserUpdate({
         type: 'SET_USER',
         payload: user,
       });
-      //   loginFormRef.current.toggleVisibility();
+      blogService.setToken(user.token);
+      toggleVisibility();
       dispatchNotification(
         { content: `Hello, ${user.name}!`, isError: false },
         3

@@ -47,9 +47,8 @@ const BlogList = ({ blogs }) => {
   });
 
   const logout = () => {
-    localStorage.clear();
-    blogService.setToken(null);
     dispatchUserUpdate({ type: 'REMOVE_USER' });
+    blogService.setToken(null);
     dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
   };
 

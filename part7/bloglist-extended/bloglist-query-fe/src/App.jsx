@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Togglable from './components/Togglable';
 import BlogForm from './components/BlogForm';
 import LoginForm from './components/LoginForm';
@@ -8,8 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useUserValue } from './UserContext';
 
 const App = () => {
-  const blogFormRef = useRef();
-  const loginFormRef = useRef();
   const user = useUserValue();
 
   useEffect(() => {
@@ -39,13 +37,13 @@ const App = () => {
   const blogList = () => <BlogList blogs={blogs} />;
 
   const blogForm = () => (
-    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+    <Togglable buttonLabel="new blog">
       <BlogForm />
     </Togglable>
   );
 
   const loginForm = () => (
-    <Togglable buttonLabel="login" ref={loginFormRef}>
+    <Togglable buttonLabel="login">
       <LoginForm />
     </Togglable>
   );

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import blogService from '../services/blogs';
 import { useNotificationDispatch } from '../NotificationContext';
 
-const BlogForm = () => {
+const BlogForm = ({ toggleVisibility }) => {
   const queryClient = useQueryClient();
   const dispatchNotification = useNotificationDispatch();
   const [title, setTitle] = useState('');
@@ -14,6 +14,7 @@ const BlogForm = () => {
     onSuccess: (newBlog) => {
       const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
       queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.concat(newBlog));
+      toggleVisibility();
       dispatchNotification(
         {
           content: `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`,
