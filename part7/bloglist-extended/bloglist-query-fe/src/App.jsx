@@ -9,11 +9,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useUserValue } from './UserContext';
 import Users from './components/Users';
 import User from './components/User';
-import { Routes, Route, useMatch, useNavigate } from 'react-router-dom';
+import { Routes, Route, useMatch, useNavigate, Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNotificationDispatch } from './NotificationContext';
 import { useUserDispatch } from './UserContext';
 import Notification from './components/Notification';
+import Navigation from './components/Navigation';
 
 const App = () => {
   const match = useMatch('/blogs/:id');
@@ -57,12 +58,6 @@ const App = () => {
     },
   });
 
-  const logout = () => {
-    dispatchUserUpdate({ type: 'REMOVE_USER' });
-    blogService.setToken(null);
-    dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
-  };
-
   const user = useUserValue();
   useEffect(() => {
     blogService.setToken(user ? user.token : null);
@@ -105,19 +100,11 @@ const App = () => {
     </Togglable>
   );
 
-  const Navigation = () => (
-    <>
-      <p>
-        {user.name} logged in&nbsp;
-        <button onClick={logout}>logout</button>
-      </p>
-    </>
-  );
   return (
     <div>
-      <h1>Blog App</h1>
+      {user != null && <Navigation />}
+      <h1>blog app</h1>
       {user == null && loginForm()}
-      {user != null && Navigation()}
       {user != null && <Notification />}
       <Routes>
         <Route path="/" element={user != null && homeView()} />
