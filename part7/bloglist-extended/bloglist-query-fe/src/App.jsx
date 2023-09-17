@@ -6,10 +6,12 @@ import blogService from './services/blogs';
 import BlogList from './components/BlogList';
 import { useQuery } from '@tanstack/react-query';
 import { useUserValue } from './UserContext';
+import Users from './components/Users';
+import User from './components/User';
+import { Routes, Route } from 'react-router-dom';
 
 const App = () => {
   const user = useUserValue();
-
   useEffect(() => {
     blogService.setToken(user ? user.token : null);
   }, [user]);
@@ -52,7 +54,11 @@ const App = () => {
     <div>
       {user == null && loginForm()}
       {user != null && blogList()}
-      {user != null && blogForm()}
+      <Routes>
+        <Route path="/" element={user != null && blogForm()} />
+        <Route path="/users" element={user != null && <Users />} />
+        <Route path="/users/:id" element={user != null && <User />} />
+      </Routes>
     </div>
   );
 };
