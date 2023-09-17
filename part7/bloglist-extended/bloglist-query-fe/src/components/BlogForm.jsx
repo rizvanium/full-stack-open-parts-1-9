@@ -14,7 +14,9 @@ const BlogForm = ({ toggleVisibility }) => {
     onSuccess: (newBlog) => {
       const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
       queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.concat(newBlog));
-      toggleVisibility();
+      if (toggleVisibility) {
+        toggleVisibility();
+      }
       dispatchNotification(
         {
           content: `A new blog, ${newBlog.title} by: ${newBlog.author} has been added.`,

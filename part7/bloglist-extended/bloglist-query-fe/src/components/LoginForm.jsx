@@ -19,7 +19,9 @@ const LoginForm = ({ toggleVisibility }) => {
         payload: user,
       });
       blogService.setToken(user.token);
-      toggleVisibility();
+      if (toggleVisibility) {
+        toggleVisibility();
+      }
       dispatchNotification(
         { content: `Hello, ${user.name}!`, isError: false },
         3
