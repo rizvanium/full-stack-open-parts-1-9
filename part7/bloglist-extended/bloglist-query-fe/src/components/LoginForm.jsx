@@ -1,16 +1,44 @@
 import { useState } from 'react';
 import Notification from './Notification';
-import PropTypes from 'prop-types';
+import { useMutation } from '@tanstack/react-query';
+import { useUserDispatch } from '../UserContext';
+import { useNotificationDispatch } from '../NotificationContext';
+import loginService from '../services/login';
+import blogService from '../services/blogs';
 
-const LoginForm = ({ handleLogin }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const dispatchUserUpdate = useUserDispatch();
+  const dispatchNotification = useNotificationDispatch();
+
+  const loginMutation = useMutation(loginService.login, {
+    onSuccess: (user) => {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      blogService.setToken(user.token);
+      dispatchUserUpdate({
+        type: 'SET_USER',
+        payload: user,
+      });
+      //   loginFormRef.current.toggleVisibility();
+      dispatchNotification(
+        { content: `Hello, ${user.name}!`, isError: false },
+        3
+      );
+      setUsername('');
+      setPassword('');
+    },
+    onError: (error) => {
+      dispatchNotification(
+        { content: error.response.data.error, isError: true },
+        3
+      );
+    },
+  });
 
   const login = async (event) => {
     event.preventDefault();
-    await handleLogin(username, password);
-    setUsername('');
-    setPassword('');
+    loginMutation.mutate({ username, password });
   };
 
   return (
@@ -44,10 +72,6 @@ const LoginForm = ({ handleLogin }) => {
       </form>
     </div>
   );
-};
-
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

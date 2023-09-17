@@ -4,8 +4,11 @@ import Blog from './Blog';
 import blogService from '../services/blogs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNotificationDispatch } from '../NotificationContext';
+import { useUserValue, useUserDispatch } from '../UserContext';
 
-const BlogList = ({ blogs, username, handleLogout }) => {
+const BlogList = ({ blogs }) => {
+  const user = useUserValue();
+  const dispatchUserUpdate = useUserDispatch();
   const queryClient = useQueryClient();
   const dispatchNotification = useNotificationDispatch();
 
@@ -43,13 +46,20 @@ const BlogList = ({ blogs, username, handleLogout }) => {
     },
   });
 
+  const logout = () => {
+    localStorage.clear();
+    blogService.setToken(null);
+    dispatchUserUpdate({ type: 'REMOVE_USER' });
+    dispatchNotification({ content: 'See Ya Soon', isError: false }, 3);
+  };
+
   return (
     <div>
       <h2>blogs</h2>
       <Notification />
       <p>
-        {username} logged in&nbsp;
-        <button onClick={handleLogout}>logout</button>
+        {user.name} logged in&nbsp;
+        <button onClick={logout}>logout</button>
       </p>
       {blogs
         .sort((a, b) => b.likes - a.likes)
@@ -67,7 +77,6 @@ const BlogList = ({ blogs, username, handleLogout }) => {
 
 BlogList.propTypes = {
   blogs: PropTypes.array.isRequired,
-  handleLogout: PropTypes.func.isRequired,
 };
 
 export default BlogList;
