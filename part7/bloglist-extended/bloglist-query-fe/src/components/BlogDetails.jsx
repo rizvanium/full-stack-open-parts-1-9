@@ -1,9 +1,43 @@
 import { useState } from 'react';
 import { useUserValue } from '../UserContext';
+import blogService from '../services/blogs';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNotificationDispatch } from '../NotificationContext';
 
 const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
   const currentUser = useUserValue();
   const [newComment, setNewComment] = useState('');
+  const queryClient = useQueryClient();
+  const dispatchNotification = useNotificationDispatch();
+
+  const newCommentMutation = useMutation(blogService.addComment, {
+    onSuccess: (newComment) => {
+      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === newComment.blog
+          ? { ...blog, comments: blog.comments.concat(newComment) }
+          : blog
+      );
+      queryClient.setQueryData({ queryKey: ['blogs'] }, updatedBlogs);
+      dispatchNotification(
+        {
+          content: `${currentUser.name} added new comment in a blog ${blog.title}`,
+          isError: false,
+        },
+        3
+      );
+    },
+    onError: (error) => {
+      dispatchNotification(
+        {
+          content: `failed to add a new comment, reason: ${error.response.data.error}`,
+          isError: true,
+        },
+        3
+      );
+    },
+  });
+
   const addOneLike = () => {
     handleUpdate({
       ...blog,
@@ -19,7 +53,8 @@ const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
 
   const addComment = (event) => {
     event.preventDefault();
-    console.log('added new comment', newComment);
+    newCommentMutation.mutate({ id: blog.id, text: newComment });
+    setNewComment('');
   };
 
   const commentList = () => {

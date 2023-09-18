@@ -22,7 +22,11 @@ const update = async ({ id, ...requestBody }) => {
   };
 
   const response = await axios.put(`${baseUrl}/${id}`, requestBody, config);
+  return response.data;
+};
 
+const addComment = async ({ id, ...requestBody }) => {
+  const response = await axios.post(`${baseUrl}/${id}/comments`, requestBody);
   return response.data;
 };
 
@@ -39,4 +43,4 @@ const setToken = (token) => {
   jwt = `Bearer ${token}`;
 };
 
-export default { getAll, create, update, remove, setToken };
+export default { getAll, create, update, addComment, remove, setToken };
