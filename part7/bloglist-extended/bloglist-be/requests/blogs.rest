@@ -13,6 +13,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWNmNTgwM
 }
 
 ###
+POST http://localhost:3003/api/blogs/64ee5871b8bf21a8023070de/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWNmNTgwMDc3YTk2ZWE4Y2Y1YzFiYiIsInVzZXJuYW1lIjoidGVzdGl1bSIsImlhdCI6MTY5NTAyMjI2NCwiZXhwIjoxNjk1MDI1ODY0fQ.SBryKHZV1pyY4fSEukNeDtT-t-zneDBE0xQrVqC3yj8
+
+{
+  "text": "Test Comment 2"
+}
+
+###
 GET http://localhost:3003/api/blogs/64eb5e0a7373a86b25311a00
 
 ###
