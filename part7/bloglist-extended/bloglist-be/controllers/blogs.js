@@ -39,16 +39,11 @@ blogsRouter.post(
       request.user.blogs = request.user.blogs.concat(newBlog.id);
       await request.user.save();
 
-      const populatedBlog = await newBlog
-        .populate('user', {
-          username: 1,
-          name: 1,
-          id: 1,
-        })
-        .populate('comments', {
-          id: 1,
-          text: 1,
-        });
+      const populatedBlog = await newBlog.populate('user', {
+        username: 1,
+        name: 1,
+        id: 1,
+      });
 
       response.status(201).json(populatedBlog);
     } catch (error) {
