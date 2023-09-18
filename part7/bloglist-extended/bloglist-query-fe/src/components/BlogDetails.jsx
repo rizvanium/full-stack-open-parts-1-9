@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useUserValue } from '../UserContext';
 import blogService from '../services/blogs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -6,7 +5,6 @@ import { useNotificationDispatch } from '../NotificationContext';
 
 const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
   const currentUser = useUserValue();
-  const [newComment, setNewComment] = useState('');
   const queryClient = useQueryClient();
   const dispatchNotification = useNotificationDispatch();
 
@@ -19,13 +17,6 @@ const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
           : blog
       );
       queryClient.setQueryData({ queryKey: ['blogs'] }, updatedBlogs);
-      dispatchNotification(
-        {
-          content: `${currentUser.name} added new comment in a blog ${blog.title}`,
-          isError: false,
-        },
-        3
-      );
     },
     onError: (error) => {
       dispatchNotification(
@@ -53,8 +44,9 @@ const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
 
   const addComment = (event) => {
     event.preventDefault();
-    newCommentMutation.mutate({ id: blog.id, text: newComment });
-    setNewComment('');
+    const commentText = event.target.comment.value;
+    newCommentMutation.mutate({ id: blog.id, text: commentText });
+    event.target.comment.value = '';
   };
 
   const commentList = () => {
@@ -88,11 +80,7 @@ const BlogDetails = ({ blog, handleUpdate, handleRemoval }) => {
       )}
       <h3>comments</h3>
       <form onSubmit={addComment}>
-        <input
-          type="text"
-          value={newComment}
-          onChange={({ target }) => setNewComment(target.value)}
-        />
+        <input type="text" name="comment" />
         <button type="submit">add comment</button>
       </form>
       {commentList()}
