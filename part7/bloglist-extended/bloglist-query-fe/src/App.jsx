@@ -12,7 +12,6 @@ import User from './components/User';
 import { Routes, Route, useMatch, useNavigate, Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNotificationDispatch } from './NotificationContext';
-import { useUserDispatch } from './UserContext';
 import Notification from './components/Notification';
 import Navigation from './components/Navigation';
 
@@ -21,7 +20,6 @@ const App = () => {
   const dispatchNotification = useNotificationDispatch();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const dispatchUserUpdate = useUserDispatch();
 
   const blogUpdateMutation = useMutation(blogService.update, {
     onSuccess: (updatedBlog) => {
@@ -61,6 +59,11 @@ const App = () => {
   const user = useUserValue();
   useEffect(() => {
     blogService.setToken(user ? user.token : null);
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate('/');
+    }
   }, [user]);
 
   const blogsQueryResult = useQuery({
@@ -103,10 +106,10 @@ const App = () => {
   return (
     <div>
       {user != null && <Navigation />}
+      <Notification />
       <h1>blog app</h1>
-      {user == null && loginForm()}
-      {user != null && <Notification />}
       <Routes>
+        <Route path="/login" element={loginForm()} />
         <Route path="/" element={user != null && homeView()} />
         <Route path="/users" element={user != null && <Users />} />
         <Route path="/users/:id" element={user != null && <User />} />

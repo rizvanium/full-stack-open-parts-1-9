@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Notification from './Notification';
 import { useMutation } from '@tanstack/react-query';
 import { useUserDispatch } from '../UserContext';
 import { useNotificationDispatch } from '../NotificationContext';
@@ -44,7 +43,6 @@ const LoginForm = ({ toggleVisibility }) => {
 
   return (
     <div>
-      <Notification />
       <h2>log in to application</h2>
       <form onSubmit={login}>
         <div>
