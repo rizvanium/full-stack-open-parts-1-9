@@ -4,6 +4,7 @@ import { useUserDispatch } from '../UserContext';
 import { useNotificationDispatch } from '../NotificationContext';
 import loginService from '../services/login';
 import blogService from '../services/blogs';
+import styled from 'styled-components';
 
 const LoginForm = ({ toggleVisibility }) => {
   const [username, setUsername] = useState('');
@@ -65,12 +66,21 @@ const LoginForm = ({ toggleVisibility }) => {
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button id="login-button" type="submit">
+        <Button id="login-button" type="submit">
           login
-        </button>
+        </Button>
       </form>
     </div>
   );
 };
+
+const Button = styled.button`
+  background: transparent;
+  border-radius: 3px;
+  border: 2px solid #bf4f74;
+  color: #bf4f74;
+  margin: 0 1em;
+  padding: 0.25em 1em;
+`;
 
 export default LoginForm;
