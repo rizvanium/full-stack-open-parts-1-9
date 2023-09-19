@@ -13,5 +13,9 @@
     "@apollo/server": "^4.9.3",
     "graphql": "^16.8.0",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0"
   }
 }
