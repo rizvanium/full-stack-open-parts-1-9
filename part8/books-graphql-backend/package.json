@@ -1,0 +1,16 @@
+{
+  "name": "books-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rizvanium",
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/server": "^4.9.3",
+    "graphql": "^16.8.0"
+  }
+}
