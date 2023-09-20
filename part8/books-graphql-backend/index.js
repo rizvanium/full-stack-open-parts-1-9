@@ -136,13 +136,30 @@ const resolvers = {
       return root.books ? root.books.length : 0;
     },
   },
+  Book: {
+    author: async (root) => {
+      const populatedRoot = await root.populate('author');
+      return populatedRoot.author;
+    },
+  },
   Query: {
     bookCount: async () => await Book.countDocuments({}),
     authorCount: async () => await Author.countDocuments({}),
-    allBooks: (root, args) => {
-      let response = !args.author ? books : books.filter(book => book.author === args.author)
-      response = !args.genre ? response : response.filter(book => book.genres.includes(args.genre));
-      return response;
+    allBooks: async (root, args) => {
+      if (!args.author && !args.genre) {
+        return Book.find({ });
+      }
+      
+      if (!args.author && args.genre) {
+        return Book.find({ genres: args.genre });
+      }
+      
+      const author = await Author.findOne({ name: args.author });
+      if (args.author && args.genre) {
+        return Book.find({ author: author.id });
+      }
+
+      return Book.find({ author: author.id, genres: args.genre });
     },
     allAuthors: async () => await Author.find({}),
   },
@@ -158,7 +175,6 @@ const resolvers = {
           name: args.author
         })
       }
-
       return book;
     },
     editAuthor: (root, args) => {
