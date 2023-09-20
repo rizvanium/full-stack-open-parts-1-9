@@ -4,6 +4,8 @@ const bookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    minLength: 3,
+    maxLength: 180,
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
