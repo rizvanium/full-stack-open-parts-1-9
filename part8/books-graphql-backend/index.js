@@ -1,6 +1,22 @@
+require('dotenv').config()
 const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
-const { v4: uuid } = require('uuid');
+const { startStandaloneServer } = require('@apollo/server/standalone');
+const mongoose = require('mongoose');
+const Book = require('./models/book');
+const Author = require('./models/author');
+
+mongoose.set('strictQuery', false)
+
+console.log('connecting to DB');
+
+mongoose.connect(process.env.DB_URI)
+  .then(() => {
+    console.log('successfully connected to DB');
+  })
+  .catch(error => {
+    console.log('error connecting to DB, reason', error.message);
+    process.exit(1);
+  });
 
 let authors = [
   {
@@ -91,7 +107,7 @@ const typeDefs = `
   type Book {
     id: ID!
     title: String!
-    author: String!
+    author: Author!
     published: Int!
     genres: [String!]!
   }
@@ -120,6 +136,9 @@ const resolvers = {
       return books.filter(book => book.author === root.name).length;
     }
   },
+  Book: {
+    author: (root) => null
+  },
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
@@ -133,14 +152,12 @@ const resolvers = {
   Mutation: {
     addBook: (root, args) => {
       const book = {
-        id: uuid(),
         ...args,
       }
       books = books.concat(book);
 
       if (!authors.find(author => author.name === args.author)) {
         authors = authors.concat({
-          id: uuid(),
           name: args.author
         })
       }
