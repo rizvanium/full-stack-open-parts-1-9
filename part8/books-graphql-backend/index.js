@@ -164,17 +164,22 @@ const resolvers = {
     allAuthors: async () => await Author.find({}),
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = {
-        ...args,
+    addBook: async (root, args) => {
+      let author = await Author.findOne({ name: args.author })
+      if (!author) {
+        author = new Author({ name: args.author, books: [] })
+        await author.save();
       }
-      books = books.concat(book);
 
-      if (!authors.find(author => author.name === args.author)) {
-        authors = authors.concat({
-          name: args.author
-        })
-      }
+      const book = new Book({
+        ...args,
+        author: author.id
+      })
+      await book.save();
+
+      author.books = author.books.concat(book.id);
+      await author.save();
+
       return book;
     },
     editAuthor: (root, args) => {
