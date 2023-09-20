@@ -155,7 +155,7 @@ const resolvers = {
       }
       
       const author = await Author.findOne({ name: args.author });
-      if (args.author && args.genre) {
+      if (args.author && !args.genre) {
         return Book.find({ author: author.id });
       }
 
