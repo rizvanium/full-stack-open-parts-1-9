@@ -1,5 +1,6 @@
 require('dotenv').config()
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { GraphQLError } = require('graphql');
 const { ApolloServer } = require('@apollo/server');
@@ -180,7 +181,26 @@ const resolvers = {
     },
   
     login: async (root, args) => {
+      const { username, password } = args;
+      const user = await User.findOne({ username })
+      const passwordIsCorrect = user
+      ? await bcrypt.compare(password, user.passwordHash)
+      : false;
 
+      if (!user || !passwordIsCorrect) {
+        throw new GraphQLError('invalid username or password', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        });
+      }
+
+      const userInfo = {
+        id: user.id,
+        username: user.username,
+      }
+
+      return { value: jwt.sign(userInfo, process.env.SECRET, { expiresIn: 3600 }) };
     }
   },
 }
