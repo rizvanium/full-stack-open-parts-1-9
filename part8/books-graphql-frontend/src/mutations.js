@@ -20,6 +20,7 @@ export const ADD_BOOK = gql`
         born
         bookCount
       }
+      genres
     }
   }
 `;

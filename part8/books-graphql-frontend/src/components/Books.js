@@ -8,7 +8,12 @@ const Books = () => {
     return <div>loading...</div>;
   }
 
+  if (result.error) {
+    return <div>failed to fetch books from a server</div>;
+  }
+
   const books = result.data.allBooks;
+  const genres = [...new Set(books.flatMap((book) => book.genres))];
 
   return (
     <div>
@@ -30,6 +35,10 @@ const Books = () => {
           ))}
         </tbody>
       </table>
+      {genres.map((genre) => (
+        <button key={genre}>{genre}</button>
+      ))}
+      <button>all genres</button>
     </div>
   );
 };
