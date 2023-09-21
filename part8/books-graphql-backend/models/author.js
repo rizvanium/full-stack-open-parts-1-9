@@ -4,20 +4,20 @@ const authorSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minLength: 3
+    minLength: 3,
   },
   born: {
     type: Number,
-    required: false
+    required: false,
   },
   books: {
     type: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book'
-      }
+        ref: 'Book',
+      },
     ],
-  }
+  },
 });
 
 authorSchema.set('toJSON', {

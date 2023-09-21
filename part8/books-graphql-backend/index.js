@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -9,15 +9,16 @@ const Book = require('./models/book');
 const Author = require('./models/author');
 const User = require('./models/user');
 
-mongoose.set('strictQuery', false)
+mongoose.set('strictQuery', false);
 
 console.log('connecting to DB');
 
-mongoose.connect(process.env.DB_URI)
+mongoose
+  .connect(process.env.DB_URI)
   .then(() => {
     console.log('successfully connected to DB');
   })
-  .catch(error => {
+  .catch((error) => {
     console.log('error connecting to DB, reason', error.message);
     process.exit(1);
   });
@@ -73,7 +74,7 @@ const typeDefs = `
       password: String!
     ): Token
   }
-`
+`;
 
 const resolvers = {
   Author: {
@@ -95,11 +96,11 @@ const resolvers = {
       if (!args.author && !args.genre) {
         return Book.find({});
       }
-      
+
       if (!args.author && args.genre) {
         return Book.find({ genres: args.genre });
       }
-      
+
       const author = await Author.findOne({ name: args.author });
       if (args.author && !args.genre) {
         return Book.find({ author: author?.id });
@@ -117,14 +118,14 @@ const resolvers = {
         throw new GraphQLError('unauthorized', {
           extensions: {
             code: 'BAD_USER_INPUT',
-          }
-        })
+          },
+        });
       }
 
-      let author = await Author.findOne({ name: args.author })
+      let author = await Author.findOne({ name: args.author });
       try {
         if (!author) {
-          author = new Author({ name: args.author, books: [] })
+          author = new Author({ name: args.author, books: [] });
           await author.save();
         }
       } catch (error) {
@@ -132,12 +133,12 @@ const resolvers = {
           extensions: {
             code: 'BAD_USER_INPUT',
             invalidArgs: args.author,
-            error
-          }
+            error,
+          },
         });
       }
 
-      const book = new Book({ ...args, author: author.id })
+      const book = new Book({ ...args, author: author.id });
       try {
         await book.save();
         author.books = author.books.concat(book.id);
@@ -146,8 +147,8 @@ const resolvers = {
         throw new GraphQLError('Saving new book failed', {
           extensions: {
             code: 'BAD_USER_INPUT',
-            error
-          }
+            error,
+          },
         });
       }
 
@@ -159,83 +160,92 @@ const resolvers = {
         throw new GraphQLError('unauthorized', {
           extensions: {
             code: 'BAD_USER_INPUT',
-          }
-        })
+          },
+        });
       }
 
       try {
-        const updatedAuthor = await Author.findOneAndUpdate( {name: args.name }, {
-          born: args.setBornTo,
-        }, { new: true, runValidators: true, context: 'query' });
+        const updatedAuthor = await Author.findOneAndUpdate(
+          { name: args.name },
+          {
+            born: args.setBornTo,
+          },
+          { new: true, runValidators: true, context: 'query' }
+        );
         return updatedAuthor;
       } catch (error) {
         throw new GraphQLError('Updating author info failed', {
           extensions: {
             code: 'BAD_USER_INPUT',
-            error
-          }
+            error,
+          },
         });
       }
     },
 
     createUser: async (root, args) => {
       const { HASH_SALT_ROUNDS, UNIVERSAL_PASSWORD } = process.env;
-  
-      const passwordHash = await bcrypt.hash(UNIVERSAL_PASSWORD, +HASH_SALT_ROUNDS)
+
+      const passwordHash = await bcrypt.hash(
+        UNIVERSAL_PASSWORD,
+        +HASH_SALT_ROUNDS
+      );
       const user = new User({ ...args, passwordHash });
       try {
         return user.save();
       } catch (error) {
-          throw new GraphQLError('Creating the user failed', {
-            extensions: {
-              code: 'BAD_USER_INPUT',
-              invalidArgs: args.username,
-              error
-            }
-          })
+        throw new GraphQLError('Creating the user failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.username,
+            error,
+          },
+        });
       }
     },
-  
+
     login: async (root, args) => {
       const { username, password } = args;
-      const user = await User.findOne({ username })
+      const user = await User.findOne({ username });
       const passwordIsCorrect = user
-      ? await bcrypt.compare(password, user.passwordHash)
-      : false;
+        ? await bcrypt.compare(password, user.passwordHash)
+        : false;
 
       if (!user || !passwordIsCorrect) {
         throw new GraphQLError('invalid username or password', {
           extensions: {
-            code: 'BAD_USER_INPUT'
-          }
+            code: 'BAD_USER_INPUT',
+          },
         });
       }
 
       const userInfo = {
         id: user.id,
         username: user.username,
-      }
+      };
 
-      return { value: jwt.sign(userInfo, process.env.SECRET, { expiresIn: 3600 }) };
-    }
+      return {
+        value: jwt.sign(userInfo, process.env.SECRET, { expiresIn: 3600 }),
+      };
+    },
   },
-}
+};
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-})
+});
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null
+    const auth = req ? req.headers.authorization : null;
     if (auth && auth.startsWith('Bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET)
+      const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET);
       const currentUser = await User.findById(decodedToken.id);
-      return { currentUser }
+      return { currentUser };
     }
   },
 }).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+  console.log(`Server ready at ${url}`);
+});
