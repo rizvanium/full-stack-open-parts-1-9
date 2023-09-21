@@ -15,7 +15,7 @@ const Authors = () => {
     if (!name && result.data && result.data.allAuthors.length !== 0) {
       setName(result.data.allAuthors[0].name);
     }
-  }, [result.data]);
+  }, [result.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (result.loading) {
     return <div>loading...</div>;
