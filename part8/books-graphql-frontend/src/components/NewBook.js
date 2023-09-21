@@ -11,7 +11,30 @@ const NewBook = () => {
   const [genre, setGenre] = useState('');
   const [genres, setGenres] = useState([]);
   const [createBook] = useMutation(ADD_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_BOOKS }, (data) => {
+        const allBooks = data?.allBooks ?? [];
+        return {
+          allBooks: allBooks.concat(response.data.addBook),
+        };
+      });
+
+      cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+        const allAuthors = data?.allAuthors ?? [];
+        const newAuthor = response.data.addBook.author;
+        const author = allAuthors.find((a) => a.name === newAuthor.name);
+        if (author) {
+          return {
+            allAuthors: allAuthors.map((a) =>
+              a.name === newAuthor.name ? { ...newAuthor } : a
+            ),
+          };
+        }
+        return {
+          allAuthors: allAuthors.concat(newAuthor),
+        };
+      });
+    },
   });
   const navigate = useNavigate();
 
