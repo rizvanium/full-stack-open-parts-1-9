@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Authors from './components/Authors';
 import Books from './components/Books';
 import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import { Route, Routes, useNavigate } from 'react-router-dom';
+import { useApolloClient } from '@apollo/client';
 
 const App = () => {
   const [token, setToken] = useState(null);
   const navigate = useNavigate();
+  const client = useApolloClient();
 
   const logout = () => {
     setToken(null);
     localStorage.clear();
+    client.resetStore();
     navigate('/');
   };
 
