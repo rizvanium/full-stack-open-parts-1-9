@@ -143,6 +143,7 @@ const resolvers = {
         await book.save();
         author.books = author.books.concat(book.id);
         await author.save();
+        await book.populate('author');
       } catch (error) {
         throw new GraphQLError('Saving new book failed', {
           extensions: {
