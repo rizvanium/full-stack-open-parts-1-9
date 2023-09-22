@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Authors from './components/Authors';
-import Books from './components/Books';
+import FilteredBooks from './components/FilteredBooks';
 import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ const App = () => {
   const [token, setToken] = useState(null);
   const navigate = useNavigate();
   const client = useApolloClient();
-
   const logout = () => {
     setToken(null);
     localStorage.clear();
@@ -42,7 +41,7 @@ const App = () => {
       <main>
         <Routes>
           <Route path="/" element={<Authors />}></Route>
-          <Route path="/books" element={<Books />}></Route>
+          <Route path="/books" element={<FilteredBooks />}></Route>
           {token && <Route path="/books/new" element={<NewBook />}></Route>}
           {!token && (
             <Route
