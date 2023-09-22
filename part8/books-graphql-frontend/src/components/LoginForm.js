@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
-import { useMutation } from '@apollo/client';
-import { LOGIN } from '../mutations';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApolloClient, useMutation } from '@apollo/client';
+import { LOGIN } from '../mutations';
+import { ME } from '../queries';
 
-const LoginForm = ({ setToken }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [login, result] = useMutation(LOGIN);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (result?.data?.login?.value) {
-      const token = result.data.login.value;
-      setToken(token);
+  const client = useApolloClient();
+  const [login, result] = useMutation(LOGIN, {
+    onCompleted: async (data) => {
+      const token = data.login.value;
       localStorage.setItem('library-user-token', token);
+      await client.refetchQueries({ include: [ME] });
       navigate('/');
-    }
-  }, [result.data]); // eslint-disable-line react-hooks/exhaustive-deps
+    },
+  });
+  const navigate = useNavigate();
 
   const handleLogin = (event) => {
     event.preventDefault();

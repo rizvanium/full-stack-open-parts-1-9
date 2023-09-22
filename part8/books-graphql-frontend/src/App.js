@@ -1,17 +1,23 @@
-import { useEffect, useState } from 'react';
 import Authors from './components/Authors';
 import FilteredBooks from './components/FilteredBooks';
+import RecommendedBooks from './components/RecommendedBooks';
 import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client';
+import { ME } from './queries';
+import { useEffect, useState } from 'react';
 
 const App = () => {
-  const [token, setToken] = useState(null);
   const navigate = useNavigate();
   const client = useApolloClient();
+  const meResponse = useQuery(ME);
+
+  if (meResponse.loading) {
+    return <div>...loading</div>;
+  }
+  const me = meResponse.data.me;
   const logout = () => {
-    setToken(null);
     localStorage.clear();
     client.resetStore();
     navigate('/');
@@ -20,6 +26,7 @@ const App = () => {
   const navLoggedIn = () => (
     <>
       <button onClick={() => navigate('/books/new')}>add book</button>
+      <button onClick={() => navigate('/recommended')}>recommended</button>
       <button onClick={logout}>logout</button>
     </>
   );
@@ -34,21 +41,22 @@ const App = () => {
         <nav>
           <button onClick={() => navigate('/')}>authors</button>
           <button onClick={() => navigate('/books')}>books</button>
-          {token ? navLoggedIn() : navLoggedOut()}
+          {me ? navLoggedIn() : navLoggedOut()}
         </nav>
       </header>
 
       <main>
         <Routes>
-          <Route path="/" element={<Authors />}></Route>
-          <Route path="/books" element={<FilteredBooks />}></Route>
-          {token && <Route path="/books/new" element={<NewBook />}></Route>}
-          {!token && (
+          <Route path="/" element={<Authors />} />
+          <Route path="/books" element={<FilteredBooks />} />
+          {me && <Route path="/books/new" element={<NewBook />} />}
+          {me && (
             <Route
-              path="/login"
-              element={<LoginForm setToken={setToken} />}
-            ></Route>
+              path="/recommended"
+              element={<RecommendedBooks genre={me.favoriteGenre} />}
+            />
           )}
+          {!me && <Route path="/login" element={<LoginForm />} />}
         </Routes>
       </main>
     </div>
