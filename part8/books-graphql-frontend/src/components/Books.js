@@ -1,8 +1,21 @@
+import { useEffect, useState } from 'react';
 import { ALL_BOOKS } from '../queries';
 import { useQuery } from '@apollo/client';
 
 const Books = () => {
-  const result = useQuery(ALL_BOOKS);
+  const [filter, setFilter] = useState(null);
+  const [genres, setGenres] = useState([]);
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre: filter, author: null },
+  });
+
+  useEffect(() => {
+    if (result.data) {
+      setGenres([
+        ...new Set(genres.concat(books.flatMap((book) => book.genres))),
+      ]);
+    }
+  }, [result.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (result.loading) {
     return <div>loading...</div>;
@@ -13,7 +26,6 @@ const Books = () => {
   }
 
   const books = result.data.allBooks;
-  const genres = [...new Set(books.flatMap((book) => book.genres))];
 
   return (
     <div>
@@ -36,9 +48,11 @@ const Books = () => {
         </tbody>
       </table>
       {genres.map((genre) => (
-        <button key={genre}>{genre}</button>
+        <button key={genre} onClick={() => setFilter(genre)}>
+          {genre}
+        </button>
       ))}
-      <button>all genres</button>
+      <button onClick={() => setFilter(null)}>all genres</button>
     </div>
   );
 };
