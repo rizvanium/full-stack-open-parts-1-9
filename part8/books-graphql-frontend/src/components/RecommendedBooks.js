@@ -18,12 +18,12 @@ const RecommendedBooks = ({ genre }) => {
   const books = result.data.allBooks;
   return (
     <>
+      <h2>recommended</h2>
       {genre && (
         <p>
           in genre <b>{genre}</b>
         </p>
       )}
-      <h2>recommended</h2>
       <BooksContainer books={books} />
     </>
   );

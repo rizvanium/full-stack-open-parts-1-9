@@ -12,14 +12,31 @@ const NewBook = () => {
   const [genres, setGenres] = useState([]);
   const [createBook] = useMutation(ADD_BOOK, {
     update: (cache, response) => {
-      cache.updateQuery({ query: ALL_BOOKS }, (data) => {
-        const allBooks = data?.allBooks ?? [];
-        return {
-          allBooks: allBooks.concat(response.data.addBook),
-        };
+      const updateAllBooksByGenre = (genre) => {
+        cache.updateQuery(
+          { query: ALL_BOOKS, variables: { genre, author: null } },
+          (data) => {
+            if (!data) {
+              return null;
+            }
+            const allBooks = data?.allBooks ?? [];
+            console.log(data);
+            return {
+              allBooks: allBooks.concat(response.data.addBook),
+            };
+          }
+        );
+      };
+
+      updateAllBooksByGenre(null);
+      response.data.addBook.genres.forEach((genre) => {
+        updateAllBooksByGenre(genre);
       });
 
       cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+        if (!data?.allAuthors) {
+          return null;
+        }
         const allAuthors = data?.allAuthors ?? [];
         const newAuthor = response.data.addBook.author;
         const author = allAuthors.find((a) => a.name === newAuthor.name);
@@ -34,6 +51,8 @@ const NewBook = () => {
           allAuthors: allAuthors.concat(newAuthor),
         };
       });
+
+      navigate('/books');
     },
   });
   const navigate = useNavigate();
@@ -47,7 +66,6 @@ const NewBook = () => {
     setAuthor('');
     setGenres([]);
     setGenre('');
-    navigate('/books');
   };
 
   const addGenre = () => {
