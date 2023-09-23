@@ -10,8 +10,12 @@ const Authors = () => {
     return <div>loading...</div>;
   }
 
+  if (authorsResponse.error) {
+    return <div>failed to load authors</div>;
+  }
+
   const authors = authorsResponse.data.allAuthors;
-  const me = meResponse.data.me;
+  const me = meResponse.error ? null : meResponse.data.me;
 
   return (
     <div>

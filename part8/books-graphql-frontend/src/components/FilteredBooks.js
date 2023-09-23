@@ -23,7 +23,7 @@ const FilteredBooks = () => {
   }
 
   if (result.error) {
-    return <div>failed to fetch books from a server</div>;
+    return <div>failed to load books</div>;
   }
 
   const books = result.data.allBooks;

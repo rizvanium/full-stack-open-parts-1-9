@@ -4,19 +4,27 @@ import RecommendedBooks from './components/RecommendedBooks';
 import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useApolloClient, useQuery, useSubscription } from '@apollo/client';
 import { ME } from './queries';
-import { useEffect, useState } from 'react';
+import { BOOK_ADDED } from './subscriptions';
 
 const App = () => {
   const navigate = useNavigate();
   const client = useApolloClient();
   const meResponse = useQuery(ME);
-
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      window.alert(
+        `new book added: ${data.data.bookAdded.title} by ${data.data.bookAdded.author.name}`
+      );
+    },
+  });
   if (meResponse.loading) {
     return <div>...loading</div>;
   }
-  const me = meResponse.data.me;
+
+  const me = meResponse.error ? null : meResponse.data.me;
+
   const logout = () => {
     localStorage.clear();
     client.resetStore();
