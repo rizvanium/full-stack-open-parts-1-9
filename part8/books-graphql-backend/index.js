@@ -2,10 +2,17 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { ApolloServer } = require('@apollo/server');
-const { startStandaloneServer } = require('@apollo/server/standalone');
+const { expressMiddleware } = require('@apollo/server/express4');
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
 const User = require('./models/user');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
+const http = require('http');
+const express = require('express');
+const cors = require('cors');
 
 mongoose.set('strictQuery', false);
 
@@ -21,25 +28,45 @@ mongoose
     process.exit(1);
   });
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+const start = async () => {
+  const app = express();
+  const httpServer = http.createServer(app);
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null;
-    if (auth && auth.startsWith('Bearer ')) {
-      try {
-        const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET);
-        const currentUser = await User.findById(decodedToken.id);
-        return { currentUser };
-      } catch (error) {
-        return { currentUser: null };
-      }
-    }
-  },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`);
-});
+  const server = new ApolloServer({
+    schema: makeExecutableSchema({ typeDefs, resolvers }),
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+
+  await server.start();
+
+  app.use(
+    '/',
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        try {
+          const auth = req ? req.headers.authorization : null;
+          if (auth && auth.startsWith('Bearer ')) {
+            const decodedToken = jwt.verify(
+              auth.substring(7),
+              process.env.SECRET
+            );
+            const currentUser = await User.findById(decodedToken.id);
+            return { currentUser };
+          }
+        } catch (error) {
+          return { currentUser: null };
+        }
+      },
+    })
+  );
+
+  const PORT = process.env.PORT;
+
+  httpServer.listen(PORT, () =>
+    console.log(`Server is now running on http://localhost:${PORT}`)
+  );
+};
+
+start();
