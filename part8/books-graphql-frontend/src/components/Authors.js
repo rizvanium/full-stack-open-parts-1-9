@@ -1,33 +1,17 @@
-import { useEffect, useState } from 'react';
-import { ALL_AUTHORS } from '../queries';
-import { EDIT_AUTHOR } from '../mutations';
 import { useQuery } from '@apollo/client';
-import { useMutation } from '@apollo/client';
+import { ALL_AUTHORS, ME } from '../queries';
+import BirthYearForm from './BirthYearForm';
 
 const Authors = () => {
-  const [name, setName] = useState('');
-  const [birthYear, setBirthYear] = useState('');
-  const [updateAuthor] = useMutation(EDIT_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }],
-  });
-  const result = useQuery(ALL_AUTHORS);
-  useEffect(() => {
-    if (!name && result.data && result.data.allAuthors.length !== 0) {
-      setName(result.data.allAuthors[0].name);
-    }
-  }, [result.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const meResponse = useQuery(ME);
+  const authorsResponse = useQuery(ALL_AUTHORS);
 
-  if (result.loading) {
+  if (authorsResponse.loading || meResponse.loading) {
     return <div>loading...</div>;
   }
 
-  const authors = result.data.allAuthors;
-
-  const changeBirthYear = (event) => {
-    event.preventDefault();
-    updateAuthor({ variables: { name, setBornTo: +birthYear } });
-    setBirthYear('');
-  };
+  const authors = authorsResponse.data.allAuthors;
+  const me = meResponse.data.me;
 
   return (
     <div>
@@ -48,30 +32,7 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
-      <h2>set birthyear</h2>
-      <form onSubmit={changeBirthYear}>
-        <label>
-          name:{' '}
-          <select value={name} onChange={({ target }) => setName(target.value)}>
-            {authors.map((a) => (
-              <option key={a.name} value={a.name}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div>
-          <label>
-            born:{' '}
-            <input
-              type="number"
-              value={birthYear}
-              onChange={({ target }) => setBirthYear(target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">update author</button>
-      </form>
+      {me && <BirthYearForm authors={authors} />}
     </div>
   );
 };
