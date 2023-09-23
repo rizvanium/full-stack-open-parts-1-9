@@ -5,7 +5,7 @@ import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useApolloClient, useQuery, useSubscription } from '@apollo/client';
-import { ME } from './queries';
+import { ME, ALL_BOOKS, ALL_AUTHORS } from './queries';
 import { BOOK_ADDED } from './subscriptions';
 
 const App = () => {
@@ -14,6 +14,7 @@ const App = () => {
   const meResponse = useQuery(ME);
   useSubscription(BOOK_ADDED, {
     onData: ({ data }) => {
+      updateCache(client.cache, data.data.bookAdded);
       window.alert(
         `new book added: ${data.data.bookAdded.title} by ${data.data.bookAdded.author.name}`
       );
@@ -69,6 +70,47 @@ const App = () => {
       </main>
     </div>
   );
+};
+
+export const updateCache = (cache, addedBook) => {
+  const updateAllBooksByGenre = (genre) => {
+    cache.updateQuery(
+      { query: ALL_BOOKS, variables: { genre, author: null } },
+      (data) => {
+        if (!data) {
+          return null;
+        }
+        const allBooks = data?.allBooks ?? [];
+        return {
+          allBooks: allBooks.concat(addedBook),
+        };
+      }
+    );
+  };
+
+  updateAllBooksByGenre(null);
+  addedBook.genres.forEach((genre) => {
+    updateAllBooksByGenre(genre);
+  });
+
+  cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+    if (!data?.allAuthors) {
+      return null;
+    }
+    const allAuthors = data?.allAuthors ?? [];
+    const newAuthor = addedBook.author;
+    const author = allAuthors.find((a) => a.name === newAuthor.name);
+    if (author) {
+      return {
+        allAuthors: allAuthors.map((a) =>
+          a.name === newAuthor.name ? { ...newAuthor } : a
+        ),
+      };
+    }
+    return {
+      allAuthors: allAuthors.concat(newAuthor),
+    };
+  });
 };
 
 export default App;
