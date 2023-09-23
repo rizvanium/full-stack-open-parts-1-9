@@ -82,31 +82,27 @@ const resolvers = {
       return root.books ? root.books.length : 0;
     },
   },
-  Book: {
-    author: async (root) => {
-      const populatedRoot = await root.populate('author');
-      return populatedRoot.author;
-    },
-  },
 
   Query: {
     bookCount: async () => await Book.countDocuments({}),
     authorCount: async () => await Author.countDocuments({}),
     allBooks: async (root, args) => {
       if (!args.author && !args.genre) {
-        return Book.find({});
+        return Book.find({}).populate('author');
       }
 
       if (!args.author && args.genre) {
-        return Book.find({ genres: args.genre });
+        return Book.find({ genres: args.genre }).populate('author');
       }
 
       const author = await Author.findOne({ name: args.author });
       if (args.author && !args.genre) {
-        return Book.find({ author: author?.id });
+        return Book.find({ author: author?.id }).populate('author');
       }
 
-      return Book.find({ author: author?.id, genres: args.genre });
+      return Book.find({ author: author?.id, genres: args.genre }).populate(
+        'author'
+      );
     },
     allAuthors: async () => await Author.find({}),
     me: async (root, args, context) => context.currentUser,
