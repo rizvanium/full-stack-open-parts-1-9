@@ -81,8 +81,14 @@ export const updateCache = (cache, addedBook) => {
           return null;
         }
         const allBooks = data?.allBooks ?? [];
+        const seen = new Map();
+        const books = allBooks
+          .concat(addedBook)
+          .filter((book) =>
+            seen.has(book.id) ? false : seen.set(book.id, true).get(book.id)
+          );
         return {
-          allBooks: allBooks.concat(addedBook),
+          allBooks: books,
         };
       }
     );
