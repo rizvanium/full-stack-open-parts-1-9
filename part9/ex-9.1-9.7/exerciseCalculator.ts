@@ -1,6 +1,6 @@
 import parseArguments from './utils/exerciseArgumentParser';
 
-interface Result {
+export interface Result {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -10,7 +10,7 @@ interface Result {
   average: number;
 }
 
-interface Rating {
+export interface Rating {
   rating: number;
   ratingDescription: string;
 }
@@ -57,20 +57,23 @@ const calculateExercises = (target: number, exerciseHours: number[]): Result => 
   };
 }
 
-try {
-  const {target, exerciseHours} = parseArguments(process.argv);
-  const result = calculateExercises(target, exerciseHours);
-  console.log(`{ periodLength: ${result.periodLength},
-    trainingDays: ${result.trainingDays},
-    success: ${result.success},
-    rating: ${result.rating},
-    ratingDescription: ${result.ratingDescription},
-    target: ${result.target},
-    average: ${result.average} }`);
-} catch (error) {
-  let errorMessage = 'Something went wrong.';
-  if (error instanceof Error) {
-    errorMessage += ` Error: ${error.message}`
+
+if (require.main === module) {
+  try {
+    const {target, exerciseHours} = parseArguments(process.argv);
+    const result = calculateExercises(target, exerciseHours);
+    console.log(`{ periodLength: ${result.periodLength},
+      trainingDays: ${result.trainingDays},
+      success: ${result.success},
+      rating: ${result.rating},
+      ratingDescription: ${result.ratingDescription},
+      target: ${result.target},
+      average: ${result.average} }`);
+  } catch (error) {
+    let errorMessage = 'Something went wrong.';
+    if (error instanceof Error) {
+      errorMessage += ` Error: ${error.message}`
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }

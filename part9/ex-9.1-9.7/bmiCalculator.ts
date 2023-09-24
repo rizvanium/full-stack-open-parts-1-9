@@ -1,6 +1,6 @@
 import parseArguments from './utils/bmiArgumentParser';
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   const heightInMeters = height / 100;
   const bmi = weight / (heightInMeters * heightInMeters);
   if (bmi < 16.0) {
@@ -22,14 +22,16 @@ const calculateBmi = (height: number, weight: number): string => {
   }
 }
 
-try {
-  const { height, weight } = parseArguments(process.argv);
-  const bmi = calculateBmi(height, weight);
-  console.log(bmi);
-} catch (error) {
-  let errorMessage = 'Something bad happened.'
-  if (error instanceof Error) { 
-    errorMessage += ` Error: ${error.message}`;
+if (require.main === module) {
+  try {
+    const { height, weight } = parseArguments(process.argv);
+    const bmi = calculateBmi(height, weight);
+    console.log(bmi);
+  } catch (error) {
+    let errorMessage = 'Something bad happened.'
+    if (error instanceof Error) { 
+      errorMessage += ` Error: ${error.message}`;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }

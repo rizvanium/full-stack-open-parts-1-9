@@ -1,4 +1,4 @@
-interface ExerciseValues {
+export interface ExerciseValues {
   target: number;
   exerciseHours: number[];
 }
