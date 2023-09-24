@@ -1,3 +1,5 @@
+import parseArguments from './utils/exerciseArgumentParser';
+
 interface Result {
   periodLength: number;
   trainingDays: number;
@@ -12,6 +14,7 @@ interface Rating {
   rating: number;
   ratingDescription: string;
 }
+
 
 const getRating = (target: number, average: number): Rating => {
   if (average >= target) {
@@ -33,8 +36,8 @@ const getRating = (target: number, average: number): Rating => {
 }
 
 const calculateExercises = (target: number, exerciseHours: number[]): Result => {
-  let trainingDays = 0;
   let hourSum = 0; 
+  let trainingDays = 0;
   for (let hours of exerciseHours) {
     if (hours > 0) {
       trainingDays++;
@@ -54,11 +57,20 @@ const calculateExercises = (target: number, exerciseHours: number[]): Result => 
   };
 }
 
-const result = calculateExercises(2, [1, 0, 2, 4.5, 0, 3, 1, 0, 4]);
-console.log(`{ periodLength: ${result.periodLength},
-  trainingDays: ${result.trainingDays},
-  success: ${result.success},
-  rating: ${result.rating},
-  ratingDescription: ${result.ratingDescription},
-  target: ${result.target},
-  average: ${result.average} }`);
+try {
+  const {target, exerciseHours} = parseArguments(process.argv);
+  const result = calculateExercises(target, exerciseHours);
+  console.log(`{ periodLength: ${result.periodLength},
+    trainingDays: ${result.trainingDays},
+    success: ${result.success},
+    rating: ${result.rating},
+    ratingDescription: ${result.ratingDescription},
+    target: ${result.target},
+    average: ${result.average} }`);
+} catch (error) {
+  let errorMessage = 'Something went wrong.';
+  if (error instanceof Error) {
+    errorMessage += ` Error: ${error.message}`
+  }
+  console.log(errorMessage);
+}
