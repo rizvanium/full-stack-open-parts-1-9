@@ -35,7 +35,7 @@ const getRating = (target: number, average: number): Rating => {
   }
 };
 
-const calculateExercises = (target: number, exerciseHours: number[]): Result => {
+export const calculateExercises = (target: number, exerciseHours: number[]): Result => {
   let hourSum = 0; 
   let trainingDays = 0;
   for (const hours of exerciseHours) {
