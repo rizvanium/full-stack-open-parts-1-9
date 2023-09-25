@@ -20,5 +20,5 @@ export default (args: string[]): BmiValues => {
   return {
     height,
     weight,
-  }
-}
+  };
+};

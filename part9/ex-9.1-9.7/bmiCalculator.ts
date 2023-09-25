@@ -20,7 +20,7 @@ export const calculateBmi = (height: number, weight: number): string => {
   } else {
     return 'Obese (Class III)';
   }
-}
+};
 
 if (require.main === module) {
   try {
@@ -28,7 +28,7 @@ if (require.main === module) {
     const bmi = calculateBmi(height, weight);
     console.log(bmi);
   } catch (error) {
-    let errorMessage = 'Something bad happened.'
+    let errorMessage = 'Something bad happened.';
     if (error instanceof Error) { 
       errorMessage += ` Error: ${error.message}`;
     }
