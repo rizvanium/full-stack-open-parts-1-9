@@ -1,4 +1,4 @@
-interface CoursePartBase {
+export interface CoursePartBase {
   name: string;
   exerciseCount: number;
 }
