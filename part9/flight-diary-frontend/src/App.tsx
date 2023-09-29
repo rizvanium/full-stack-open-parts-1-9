@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { DiaryEntry, Visibility, Weather } from "./types";
+import { DiaryEntry, NotificationType, Visibility, Weather } from "./types";
+import Notification from './components/Notification';
 import diaryService from "./services/diaryService";
+import axios from 'axios';
 
 function App() {
   const [date, setDate] = useState('');
   const [comment, setComment] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [visibility, setVisibility] = useState(Visibility.Great);
   const [weather, setWeather] = useState(Weather.Sunny);
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -28,12 +31,18 @@ function App() {
         setVisibility(Visibility.Great)
         setWeather(Weather.Sunny);
         setComment('');
+      }).catch(error => {
+        if (axios.isAxiosError(error)) {
+          setErrorMessage(error.response?.data);
+        }
+        setTimeout(() => setErrorMessage(''), 3000);
       });
   }
 
   return (
     <div>
       <h2>Add new entry</h2>
+      <Notification text={errorMessage} type={NotificationType.Error}/>
       <form onSubmit={addNewEntry}>
         <div>
           <label>

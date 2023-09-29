@@ -13,6 +13,11 @@ export enum Visibility {
   Poor = 'poor',
 }
 
+export enum NotificationType {
+  Error = 'error',
+  Info = 'info'
+}
+
 export interface DiaryEntry {
   id: number;
   date: string;
