@@ -1,0 +1,1 @@
+export type stfu = string;
