@@ -1,8 +1,7 @@
 export enum Gender {
   Male = 'male',
-  Femlae = 'female',
+  Female = 'female',
   Other = 'other',
-
 }
 
 export enum HealthCheckRating {
