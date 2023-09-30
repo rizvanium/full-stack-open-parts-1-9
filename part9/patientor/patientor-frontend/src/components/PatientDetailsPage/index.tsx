@@ -1,33 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import patients from "../services/patients";
-import { Diagnosis, Gender, Patient } from "../types";
+import patients from "../../services/patients";
+import { Diagnosis, Patient } from "../../types";
 import { Box, Typography } from "@mui/material";
-import TransgenderIcon from '@mui/icons-material/Transgender';
-import FemaleIcon from '@mui/icons-material/Female';
-import MaleIcon from '@mui/icons-material/Male';
-
+import GenderIcon from "./GenderIcon";
+import Entries from "./Entries";
 
 interface Props {
-  gender: Gender;
-}
-
-const GenderIcon = ({ gender }: Props) => {
-  switch (gender) {
-    case Gender.Female:
-      return <FemaleIcon />;
-    case Gender.Male:
-      return <MaleIcon />;
-    default:
-      return <TransgenderIcon />;
-  }
-}
-
-interface PatientProps {
   diagnoses: Map<Diagnosis['code'], Diagnosis>;
 }
 
-const PatientDetails = ({ diagnoses }: PatientProps) => {
+const PatientDetails = ({ diagnoses }: Props) => {
   let { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
 
@@ -63,21 +46,7 @@ const PatientDetails = ({ diagnoses }: PatientProps) => {
           occupation: {patient.occupation}
         </Typography>
       </Box>
-      <Box sx={{marginTop: 3}}>
-        <Typography variant="h6" fontWeight="bold">
-          entries
-        </Typography>
-        {patient?.entries?.map(entry => 
-          <div key={entry.id}>
-            <Typography variant="subtitle2">
-              {entry.date} {entry.description}
-            </Typography>
-            <ul>
-              {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnoses.get(code)?.name}</li>)}
-            </ul>
-          </div>
-        )}
-      </Box>
+      {patient?.entries && <Entries entries={patient.entries} diagnoses={diagnoses}/>}
     </>
   )
 }
