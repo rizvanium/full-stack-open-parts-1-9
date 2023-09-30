@@ -44,12 +44,13 @@ const PatientDetails = () => {
   }
   
   return (
-
-    <Box>
-      <Typography align="left" variant="h6" fontWeight="bold" sx={{marginTop: 3}}>
-        {patient.name}
-        <GenderIcon gender={patient.gender} />
-      </Typography>
+    <>
+      <Box sx={{marginTop: 3}}>
+        <Typography align="left" variant="h4" fontWeight="bold">
+          {patient.name}
+          <GenderIcon gender={patient.gender} />
+        </Typography>
+      </Box>
       <Box sx={{marginTop: 1}}>
         <Typography variant="subtitle2">
           ssn: {patient.ssn}
@@ -58,7 +59,22 @@ const PatientDetails = () => {
           occupation: {patient.occupation}
         </Typography>
       </Box>
-    </Box>
+      <Box sx={{marginTop: 3}}>
+        <Typography variant="h6" fontWeight="bold">
+          entries
+        </Typography>
+        {patient?.entries?.map(entry => 
+          <div>
+            <Typography variant="subtitle2">
+              {entry.date} {entry.description}
+            </Typography>
+            <ul>
+              {entry.diagnosisCodes?.map(code => <li>{code}</li>)}
+            </ul>
+          </div>
+        )}
+      </Box>
+    </>
   )
 }
 
