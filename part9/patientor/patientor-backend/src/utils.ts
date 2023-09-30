@@ -74,7 +74,8 @@ export const toPatient = (object: unknown): Patient => {
   if (object && typeof object === 'object' && 'id' in object) {
     return {
       id: parseId(object.id),
-      ...patientRequest
+      ...patientRequest,
+      entries: []
     };
   }
   
