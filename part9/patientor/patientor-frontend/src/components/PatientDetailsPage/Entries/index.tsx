@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { Diagnosis, Entry } from "../../types";
+import { Diagnosis, Entry } from "../../../types";
 import EntryDetails from "./EntryDetails";
 
 interface Props {
