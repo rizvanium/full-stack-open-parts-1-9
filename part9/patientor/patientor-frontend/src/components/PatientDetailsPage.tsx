@@ -64,12 +64,12 @@ const PatientDetails = () => {
           entries
         </Typography>
         {patient?.entries?.map(entry => 
-          <div>
+          <div key={entry.id}>
             <Typography variant="subtitle2">
               {entry.date} {entry.description}
             </Typography>
             <ul>
-              {entry.diagnosisCodes?.map(code => <li>{code}</li>)}
+              {entry.diagnosisCodes?.map(code => <li key={code}>{code}</li>)}
             </ul>
           </div>
         )}
