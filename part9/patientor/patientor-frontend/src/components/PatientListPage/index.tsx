@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Box, Table, Button, TableHead, Typography, TableCell, TableRow, TableBody } from '@mui/material';
+import { Box, Table, Button, TableHead, Typography, TableCell, TableRow, TableBody, Link } from '@mui/material';
+import { Link as RouterLink } from "react-router-dom";
+
 import axios from 'axios';
 
 import { PatientFormValues, Patient } from "../../types";
@@ -66,7 +68,11 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
         <TableBody>
           {Object.values(patients).map((patient: Patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell>
+                <Link underline="hover" component={RouterLink} to={`/patients/${patient.id}`}>
+                  {patient.name}
+                </Link>
+              </TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
