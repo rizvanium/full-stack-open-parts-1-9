@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import patients from "../services/patients";
-import { Gender, Patient } from "../types";
+import { Diagnosis, Gender, Patient } from "../types";
 import { Box, Typography } from "@mui/material";
 import TransgenderIcon from '@mui/icons-material/Transgender';
 import FemaleIcon from '@mui/icons-material/Female';
@@ -23,7 +23,11 @@ const GenderIcon = ({ gender }: Props) => {
   }
 }
 
-const PatientDetails = () => {
+interface PatientProps {
+  diagnoses: Map<Diagnosis['code'], Diagnosis>;
+}
+
+const PatientDetails = ({ diagnoses }: PatientProps) => {
   let { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
 
@@ -69,7 +73,7 @@ const PatientDetails = () => {
               {entry.date} {entry.description}
             </Typography>
             <ul>
-              {entry.diagnosisCodes?.map(code => <li key={code}>{code}</li>)}
+              {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnoses.get(code)?.name}</li>)}
             </ul>
           </div>
         )}
