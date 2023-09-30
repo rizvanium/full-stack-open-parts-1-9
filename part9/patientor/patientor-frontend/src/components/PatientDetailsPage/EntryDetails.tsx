@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { Diagnosis, Entry, HealthCheckEntry, HospitalEntry, OccupationalHealthcareEntry } from "../../types";
-import EntryIcon from "./EntryIcon";
-import HealthRatingIcon from "./HealthRatingIcon";
+import EntryIcon from "./Icons/EntryIcon";
+import HealthRatingIcon from "./Icons/HealthRatingIcon";
 
 interface Props {
   entry: Entry;

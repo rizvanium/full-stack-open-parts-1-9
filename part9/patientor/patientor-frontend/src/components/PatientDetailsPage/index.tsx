@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import patients from "../../services/patients";
 import { Diagnosis, Patient } from "../../types";
 import { Box, Typography } from "@mui/material";
-import GenderIcon from "./GenderIcon";
+import GenderIcon from "./Icons/GenderIcon";
 import Entries from "./Entries";
 
 interface Props {

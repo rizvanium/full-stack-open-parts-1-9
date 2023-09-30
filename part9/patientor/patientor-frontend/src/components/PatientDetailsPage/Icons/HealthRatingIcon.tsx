@@ -1,5 +1,5 @@
 import HeartIcon from '@mui/icons-material/Favorite';
-import { HealthCheckRating } from '../../types';
+import { HealthCheckRating } from '../../../types';
 
 interface Props {
   rating: HealthCheckRating;
