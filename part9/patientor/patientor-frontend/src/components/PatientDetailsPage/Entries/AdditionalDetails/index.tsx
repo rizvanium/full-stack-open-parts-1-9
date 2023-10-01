@@ -1,4 +1,4 @@
-import { Entry } from "../../../../types";
+import { Entry, EntryType } from "../../../../types";
 import OccupationalEntryDetails from "./OccupationalEntryDetails";
 import HealthcheckEntryDetails from "./HealthCheckDetails";
 import HospitalEntryDetails from "./HospitalEntryDetails";
@@ -13,11 +13,11 @@ interface AdditionalDetailsProps {
 
 const AdditionalDetails = ({ entry }: AdditionalDetailsProps) => {
   switch (entry.type) {
-    case 'Hospital':
+    case EntryType.Hospital :
       return <HospitalEntryDetails entry={entry}/>
-    case 'HealthCheck':
+    case EntryType.HealthCheck:
       return <HealthcheckEntryDetails entry={entry} />
-    case 'OccupationalHealthcare':
+    case EntryType.OccupationalHealthcare:
       return <OccupationalEntryDetails entry={entry} />;
     default:
       return assertNever(entry);
