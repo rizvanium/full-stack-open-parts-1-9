@@ -1,6 +1,6 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { toPatientRequest } from '../utils';
+import { toEntryRequest, toPatientRequest } from '../utils';
 
 const router = express.Router();
 
@@ -11,14 +11,14 @@ router.get('/', (_req, res) => {
 
 router.get('/:id', (req, res) => {
   const id = req.params.id;
-  const patients = patientService.get(id);
+  const patient = patientService.get(id);
 
-  if (!patients) {
+  if (!patient) {
     res.status(404).send('patient could not be found');
     return;
   }
 
-  res.status(200).send(patients);
+  res.status(200).send(patient);
 });
 
 router.post('/', (req, res) => {
@@ -31,7 +31,33 @@ router.post('/', (req, res) => {
     if (error instanceof Error) {
       errorMessage += ' Error: ' + error.message;
     }
-    res.status(404).send(errorMessage);
+    res.status(400).send(errorMessage);
+  }
+});
+
+router.post('/:id/entries', (req, res) => {
+  const id = req.params.id;
+  const patient = patientService.get(id);
+
+  if (!patient) {
+    res.status(404).send('patient could not be found');
+    return;
+  }
+
+  try {
+    const entryRequest = toEntryRequest(req.body);
+    const newEntry = patientService.addNewEntry(patient, entryRequest);
+
+    res.status(200).send(newEntry);
+
+  } catch (error) {
+    let errorMessage = 'Something went wrong...';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    res.status(400).send(errorMessage);
   }
 });
 
