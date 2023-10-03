@@ -5,6 +5,7 @@ import { Diagnosis, Patient } from "../../types";
 import { Box, Typography } from "@mui/material";
 import GenderIcon from "./Icons/GenderIcon";
 import Entries from "./Entries";
+import PatientEntryForm from "./PatientEntryForm";
 
 interface Props {
   diagnoses: Map<Diagnosis['code'], Diagnosis>;
@@ -46,6 +47,7 @@ const PatientDetails = ({ diagnoses }: Props) => {
           occupation: {patient.occupation}
         </Typography>
       </Box>
+      <PatientEntryForm diagnoses={diagnoses} />
       {patient?.entries && <Entries entries={patient.entries} diagnoses={diagnoses}/>}
     </>
   )
