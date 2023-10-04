@@ -39,7 +39,7 @@ const addNewEntry = (patient: Patient, request: EntryRequest): Entry => {
   patients = patients.map(p => patient.id === p.id ? {
     ...p,
     entries: p.entries.concat(newEntry), 
-  } : patient);
+  } : p);
   
   return newEntry;
 };
