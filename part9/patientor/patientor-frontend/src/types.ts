@@ -1,3 +1,4 @@
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
 
 export enum Gender {
   Male = "male",
@@ -55,6 +56,7 @@ export interface HealthCheckEntry extends BaseEntry {
 }
 
 export type Entry = HospitalEntry | OccupationalHealthcareEntry | HealthCheckEntry;
+export type EntryRequest = UnionOmit<Entry, 'id'>;
 
 export interface Patient {
   id: string;

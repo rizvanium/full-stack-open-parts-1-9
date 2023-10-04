@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import patients from "../../services/patients";
-import { Diagnosis, Patient } from "../../types";
-import { Box, Typography } from "@mui/material";
+import { Diagnosis, Entry, Patient } from "../../types";
+import { Box, Button, Typography } from "@mui/material";
 import GenderIcon from "./Icons/GenderIcon";
 import Entries from "./Entries";
 import PatientEntryForm from "./PatientEntryForm";
@@ -30,6 +30,13 @@ const PatientDetails = ({ diagnoses }: Props) => {
   if (!patient) {
     return <div>No info found</div>
   }
+
+  const addNewEntry = (entry: Entry) => {
+    setPatient({
+      ...patient,
+      entries: patient.entries ? patient.entries.concat(entry): [],
+    });
+  }
   
   return (
     <>
@@ -47,8 +54,9 @@ const PatientDetails = ({ diagnoses }: Props) => {
           occupation: {patient.occupation}
         </Typography>
       </Box>
-      <PatientEntryForm diagnoses={diagnoses} />
+      <PatientEntryForm patientId={id} diagnoses={diagnoses} handleNewEntry={addNewEntry} />
       {patient?.entries && <Entries entries={patient.entries} diagnoses={diagnoses}/>}
+      <Button variant="contained" sx={{ marginTop: 2 }} >add new entry</Button>
     </>
   )
 }

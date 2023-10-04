@@ -10,7 +10,7 @@ interface Props {
 const Entries = ({ entries, diagnoses }: Props) => {
   if (entries.length === 0) {
     return (
-      <Box sx={{marginTop: 3}}>
+      <Box sx={{ marginTop: 3 }}>
         <Typography variant="h6" fontWeight="bold">
           patient has no entries
         </Typography>
@@ -23,7 +23,7 @@ const Entries = ({ entries, diagnoses }: Props) => {
       <Typography variant="h6" fontWeight="bold">
         entries
       </Typography>
-      {entries.map(entry => <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses}/>)}
+      { entries.map(entry => <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses}/>) }
     </Box>
   )
 }
