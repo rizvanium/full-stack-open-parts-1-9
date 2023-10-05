@@ -6,7 +6,7 @@ import {
   FormControl,
   Input, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material"
 import { useState } from "react";
-import { Diagnosis, Entry, EntryType, HealthCheckRating } from "../../types";
+import { Diagnosis, Entry, EntryRequest, EntryType, HealthCheckRating } from "../../types";
 import { DateField } from "@mui/x-date-pickers";
 import { Dayjs } from 'dayjs';
 import patientService from '../../services/patients';
@@ -57,14 +57,53 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
     }
 
     try {
-      const newEntry = await patientService.addEntry(patientId, {
+      const entryBase = {
         date: date.format('YYYY-MM-DD'),
         description,
         specialist,
         diagnosisCodes,
-        type: EntryType.HealthCheck,
-        healthCheckRating
-      });
+      };
+      let entryRequest: EntryRequest | null = null;
+      switch (type) {
+        case EntryType.Hospital:
+          
+          if (!discharge.date) {
+            return;
+          }
+
+          entryRequest = {
+            type,
+            ...entryBase,
+            discharge: {
+              date: discharge.date.format('YYYY-MM-DD'),
+              criteria: discharge.criteria
+            },
+          }
+          break;
+        case EntryType.HealthCheck:
+          entryRequest = {
+            type,
+            ...entryBase,
+            healthCheckRating
+          }
+          break;
+        default:
+          if (!sickLeave.startDate || !sickLeave.endDate) {
+            return;
+          }
+          entryRequest = {
+            type,
+            ...entryBase,
+            employerName,
+            sickLeave: {
+              startDate: sickLeave.startDate.format('YYYY-MM-DD'),
+              endDate: sickLeave.startDate.format('YYYY-MM-DD'),
+            },
+          }
+          break;
+      };
+
+      const newEntry = await patientService.addEntry(patientId, entryRequest);
       handleNewEntry(newEntry);
     } catch (error) {
       let errorMessage = 'Something went wrong.';
