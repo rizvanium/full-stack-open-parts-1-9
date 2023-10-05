@@ -52,6 +52,30 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry, closeForm }: P
     );
   };
 
+  const resetFields = () => {
+    setError(null);
+    setDate(null);
+    setSpecialist('');
+    setDescription('');
+    setEmployerName('');
+    setDiagnosisCodes([]);
+    setType(EntryType.HealthCheck);
+    setHealthCheckRating(HealthCheckRating.Healthy);
+    setDischarge({
+      date: null,
+      criteria: ''
+    });
+    setSickLeave({
+      startDate: null,
+      endDate: null,
+    });
+  };
+
+  const handleCancellation = () => {
+    resetFields();
+    closeForm();
+  }
+
   const addNewEntry = async () => {
     if (!date) {
       return;
@@ -106,6 +130,7 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry, closeForm }: P
 
       const newEntry = await patientService.addEntry(patientId, entryRequest);
       handleNewEntry(newEntry);
+      resetFields();
       closeForm();
     } catch (error) {
       let errorMessage = 'Something went wrong.';
@@ -196,7 +221,7 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry, closeForm }: P
           setSickLeave={setSickLeave}
         />
         <Box sx={{display: "flex", alignItems: 'center', justifyContent: 'space-between', marginTop: 2}}>
-          <Button variant="contained" color="error" onClick={() => closeForm()}>cancel</Button>
+          <Button variant="contained" color="error" onClick={handleCancellation}>cancel</Button>
           <Button onClick={addNewEntry} variant="contained" color="success">add</Button>
         </Box>
       </Box>
