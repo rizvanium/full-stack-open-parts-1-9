@@ -36,8 +36,8 @@ const PatientDetails = ({ diagnoses }: Props) => {
       ...patient,
       entries: patient.entries ? patient.entries.concat(entry): [],
     });
-  }
-  
+  };
+
   return (
     <>
       <Box sx={{marginTop: 3}}>

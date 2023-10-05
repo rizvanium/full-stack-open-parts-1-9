@@ -4,6 +4,7 @@ import { Diagnosis, Entry, EntryType, HealthCheckRating } from "../../types";
 import { DateField } from "@mui/x-date-pickers";
 import { Dayjs } from 'dayjs';
 import patientService from '../../services/patients';
+import AdditionalEntryInfo from "./AdditionalEntryInfo";
 
 interface Props {
   patientId: string | undefined,
@@ -13,12 +14,24 @@ interface Props {
 
 const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
   const [error, setError] = useState<string | null>(null);
+  const [type, setType] = useState<EntryType>(EntryType.HealthCheck);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [description, setDescription] = useState('');
   const [specialist, setSpecialist] = useState('');
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>(Object.keys([]));
   const [healthCheckRating, setHealthCheckRating] = useState(HealthCheckRating.Healthy);
-  
+  const [employerName, setEmployerName] = useState('');
+
+  const [discharge, setDischarge] = useState<{ date: Dayjs | null, criteria: string }>({
+    date: null,
+    criteria: '',
+  });
+
+  const [sickLeave, setSickLeave] = useState<{ startDate: Dayjs | null, endDate: Dayjs | null}>({
+    startDate: null,
+    endDate: null,
+  });
+
   if (!patientId) {
     return null;
   }
@@ -104,20 +117,17 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
             ))}
           </Select>
         </FormControl>
-        <FormControl variant="standard" fullWidth>
-          <InputLabel id="health-check-rating-label">HealthCheck Rating</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={healthCheckRating}
-            onChange={({target: {value}}) => setHealthCheckRating(value as HealthCheckRating)}
-          >
-            <MenuItem value={HealthCheckRating.Healthy}>Healthy</MenuItem>
-            <MenuItem value={HealthCheckRating.LowRisk}>Low Risk</MenuItem>
-            <MenuItem value={HealthCheckRating.HighRisk}>High Risk</MenuItem>
-            <MenuItem value={HealthCheckRating.CriticalRisk}>Critical Risk</MenuItem>
-          </Select>
-        </FormControl>
+        <AdditionalEntryInfo
+          type={type}
+          healthCheckRating={healthCheckRating} 
+          setHealthCheckRating={setHealthCheckRating} 
+          discharge={discharge} 
+          setDischarge={setDischarge} 
+          employerName={employerName} 
+          sickLeave={sickLeave} 
+          setEmployerName={setEmployerName} 
+          setSickLeave={setSickLeave}
+        />
         <Box sx={{display: "flex", alignItems: 'center', justifyContent: 'space-between', marginTop: 2}}>
           <Button variant="contained" color="error">cancel</Button>
           <Button onClick={addNewEntry} variant="contained" color="success">add</Button>
