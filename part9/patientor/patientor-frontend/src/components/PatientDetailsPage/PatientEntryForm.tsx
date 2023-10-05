@@ -95,10 +95,10 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
             onChange={({target: { value }}) => setSpecialist(value)}
         />
         <FormControl variant="standard" fullWidth>
-          <InputLabel id="demo-simple-select-standard-label">Diagnosis Codes</InputLabel>
+          <InputLabel id="diagnosis-codes-label">Diagnosis Codes</InputLabel>
           <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-multiple-name"
+            id="diagnosis-codes"
+            labelId="diagnosis-codes-label"
             multiple
             displayEmpty
             value={diagnosisCodes}
@@ -115,6 +115,26 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
                 <ListItemText primary={code} />
               </MenuItem>
             ))}
+          </Select>
+        </FormControl>
+        <FormControl variant="standard" fullWidth>
+          <InputLabel id="entry-type-label">Entry Type</InputLabel>
+          <Select
+            id="entry-type"
+            labelId="entry-type-label"
+            value={type}
+            onChange={({ target: { value } }) => setType(value as EntryType)}
+            input={<Input fullWidth />}
+          >
+            <MenuItem key={EntryType.HealthCheck} value={EntryType.HealthCheck} >
+              HealthCheck
+            </MenuItem>
+            <MenuItem key={EntryType.Hospital} value={EntryType.Hospital} >
+              Hospital
+            </MenuItem>
+            <MenuItem key={EntryType.OccupationalHealthcare} value={EntryType.OccupationalHealthcare} >
+              Occupational
+            </MenuItem>
           </Select>
         </FormControl>
         <AdditionalEntryInfo
