@@ -1,28 +1,33 @@
+import { Button } from '@mui/material';
 import { useState, forwardRef, useImperativeHandle } from 'react';
 
-const Togglable = forwardRef(() => {
-  // const [isVisible, setVisible] = useState(false);
+interface Props {
+  children: React.ReactNode;
+  buttonLabel: string;
+}
 
-  // const hiddenWhenVisible = { display: isVisible ? 'none' : '' };
-  // const VisibleWhenVisible = { display: isVisible ? '' : 'none' };
+const Togglable = forwardRef((props: Props, ref) => {
+  const [isVisible, setVisible] = useState(false);
 
-  // const toggleVisibility = () => {
-  //   setVisible(!isVisible);
-  // };
+  const hiddenWhenVisible = { display: isVisible ? 'none' : '' };
+  const VisibleWhenVisible = { display: isVisible ? '' : 'none' };
 
-  // useImperativeHandle(refs, () => {
-  //   return { toggleVisibility };
-  // });
+  const toggleVisibility = () => {
+    setVisible(!isVisible);
+  };
+
+  useImperativeHandle(ref, () => {
+    return { toggleVisibility };
+  });
 
   return (
     <div>
-      {/* <div style={hiddenWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+      <div style={hiddenWhenVisible}>
+        <Button sx={{ marginTop: 3 }} variant="contained"onClick={toggleVisibility} color='primary'>{props.buttonLabel}</Button>
       </div>
       <div style={VisibleWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
-      </div> */}
+      </div>
     </div>
   );
 });

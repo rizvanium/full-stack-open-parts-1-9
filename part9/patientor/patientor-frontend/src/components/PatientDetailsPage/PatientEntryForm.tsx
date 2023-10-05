@@ -16,9 +16,10 @@ interface Props {
   patientId: string | undefined,
   diagnoses: Map<Diagnosis['code'], Diagnosis>;
   handleNewEntry: (addedEntry: Entry) => void;
+  closeForm: () => void;
 }
 
-const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
+const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry, closeForm }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [type, setType] = useState<EntryType>(EntryType.HealthCheck);
   const [date, setDate] = useState<Dayjs | null>(null);
@@ -105,6 +106,7 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
 
       const newEntry = await patientService.addEntry(patientId, entryRequest);
       handleNewEntry(newEntry);
+      closeForm();
     } catch (error) {
       let errorMessage = 'Something went wrong.';
       if (error instanceof Error) {
@@ -194,7 +196,7 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
           setSickLeave={setSickLeave}
         />
         <Box sx={{display: "flex", alignItems: 'center', justifyContent: 'space-between', marginTop: 2}}>
-          <Button variant="contained" color="error">cancel</Button>
+          <Button variant="contained" color="error" onClick={() => closeForm()}>cancel</Button>
           <Button onClick={addNewEntry} variant="contained" color="success">add</Button>
         </Box>
       </Box>

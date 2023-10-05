@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import patients from "../../services/patients";
+import { useEffect, useRef, useState } from "react";
 import { Diagnosis, Entry, Patient } from "../../types";
-import { Box, Button, Typography } from "@mui/material";
-import GenderIcon from "./Icons/GenderIcon";
-import Entries from "./Entries";
+import { Box, Typography } from "@mui/material";
+import { useParams } from "react-router-dom";
 import PatientEntryForm from "./PatientEntryForm";
+import GenderIcon from "./Icons/GenderIcon";
+import patients from "../../services/patients";
+import Togglable from "../Togglable";
+import Entries from "./Entries";
 
 interface Props {
   diagnoses: Map<Diagnosis['code'], Diagnosis>;
@@ -14,11 +15,13 @@ interface Props {
 const PatientDetails = ({ diagnoses }: Props) => {
   let { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
+  const patientRef = useRef<{ toggleVisibility: () => void }>(null);
 
   useEffect(() => {
     if (!id) {
       return;
     }
+    
     patients.get(id).then(data => {
       setPatient({
         ...data, 
@@ -26,17 +29,23 @@ const PatientDetails = ({ diagnoses }: Props) => {
       });
     });
   }, [id])
-
+  
   if (!patient) {
     return <div>No info found</div>
   }
-
+  
   const addNewEntry = (entry: Entry) => {
     setPatient({
       ...patient,
       entries: patient.entries ? patient.entries.concat(entry): [],
     });
   };
+  
+  const closeForm = () => {
+    if (patientRef && patientRef.current) {
+      patientRef.current.toggleVisibility();
+    }
+  }
 
   return (
     <>
@@ -54,9 +63,15 @@ const PatientDetails = ({ diagnoses }: Props) => {
           occupation: {patient.occupation}
         </Typography>
       </Box>
-      <PatientEntryForm patientId={id} diagnoses={diagnoses} handleNewEntry={addNewEntry} />
+      <Togglable ref={patientRef} buttonLabel="add new entry">
+        <PatientEntryForm
+          patientId={id}
+          diagnoses={diagnoses}
+          handleNewEntry={addNewEntry}
+          closeForm={closeForm}
+        />
+      </Togglable>
       {patient?.entries && <Entries entries={patient.entries} diagnoses={diagnoses}/>}
-      <Button variant="contained" sx={{ marginTop: 2 }} >add new entry</Button>
     </>
   )
 }
