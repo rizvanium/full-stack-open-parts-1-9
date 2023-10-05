@@ -1,4 +1,10 @@
-import { Alert, Box, Button, Checkbox, FormControl, Input, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, Slider, TextField, Typography } from "@mui/material"
+import { 
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  Input, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material"
 import { useState } from "react";
 import { Diagnosis, Entry, EntryType, HealthCheckRating } from "../../types";
 import { DateField } from "@mui/x-date-pickers";
@@ -75,7 +81,7 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
       {error && <Alert severity="error">{error}</Alert>}
       <Box sx={{borderStyle: 'dashed', marginTop: 3, padding: 1}}>
         <Typography variant="h6" fontWeight="bold" marginTop={1}>
-          New HealthCheck Entry
+          New {getTitle(type)} Entry
         </Typography>
         <TextField
             fullWidth
@@ -139,13 +145,13 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
         </FormControl>
         <AdditionalEntryInfo
           type={type}
-          healthCheckRating={healthCheckRating} 
-          setHealthCheckRating={setHealthCheckRating} 
-          discharge={discharge} 
-          setDischarge={setDischarge} 
-          employerName={employerName} 
-          sickLeave={sickLeave} 
-          setEmployerName={setEmployerName} 
+          healthCheckRating={healthCheckRating}
+          setHealthCheckRating={setHealthCheckRating}
+          discharge={discharge}
+          setDischarge={setDischarge}
+          employerName={employerName}
+          sickLeave={sickLeave}
+          setEmployerName={setEmployerName}
           setSickLeave={setSickLeave}
         />
         <Box sx={{display: "flex", alignItems: 'center', justifyContent: 'space-between', marginTop: 2}}>
@@ -156,5 +162,16 @@ const PatientEntryForm = ({ patientId, diagnoses, handleNewEntry }: Props) => {
     </>
   )
 };
+
+const getTitle = (type: EntryType): string => {
+  switch (type) {
+    case EntryType.HealthCheck:
+      return 'Health Check';
+    case EntryType.Hospital:
+      return 'Hospital';
+    default:
+      return 'Occupational Healthcare';
+  }
+}
 
 export default PatientEntryForm;
